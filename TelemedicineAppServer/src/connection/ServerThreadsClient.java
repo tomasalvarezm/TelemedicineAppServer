@@ -12,8 +12,12 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import telemedicineApp.jdbc.JDBCBitalinoSignalManager;
+import telemedicineApp.jdbc.JDBCDoctorManager;
 import telemedicineApp.jdbc.JDBCManager;
+import telemedicineApp.jdbc.JDBCMedicalHistoryManager;
 import telemedicineApp.jdbc.JDBCPatientManager;
+import telemedicineApp.jdbc.JDBCSymptomManager;
 import telemedicineApp.pojos.Patient;
 
 public class ServerThreadsClient implements Runnable {
@@ -26,10 +30,19 @@ public class ServerThreadsClient implements Runnable {
 
 	private JDBCManager dataBaseManager;
 	private JDBCPatientManager patientManager;
+	private JDBCDoctorManager doctorManager;
+	private JDBCSymptomManager symptomManager;
+	private JDBCMedicalHistoryManager medicalHistoryManager;
+	private JDBCBitalinoSignalManager bitalinoSignalManager;
+	
 
 	public ServerThreadsClient(Socket socket) {
 		this.socket = socket;
 		this.dataBaseManager = new JDBCManager();
+		this.symptomManager = new JDBCSymptomManager(dataBaseManager);
+		this.medicalHistoryManager = new JDBCMedicalHistoyManager(dataBaseManager, symptomManager);
+		this.bitalinoSignalManager = new JDBCBitalinoSignalManager(dataBaseManager);
+		this.doctorManager = new JDBCDoctorManager(dataBaseManager);
 		this.patientManager = new JDBCPatientManager(dataBaseManager);
 	}
 
