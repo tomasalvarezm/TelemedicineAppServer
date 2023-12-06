@@ -19,6 +19,13 @@ public class JDBCMedicalHistoryManager implements MedicalHistoryManager {
 	private JDBCSymptomManager sm;
 
 	
+	
+	public JDBCMedicalHistoryManager(JDBCManager manager, JDBCSymptomManager sm) {
+		super();
+		this.manager = manager;
+		this.sm = sm;
+	}
+
 	public ArrayList<MedicalHistory> getMedHistoriesByPatientId (String patient_id){
 		ArrayList<MedicalHistory> medhists	= new ArrayList <MedicalHistory>();
 		Medication medication=null;
