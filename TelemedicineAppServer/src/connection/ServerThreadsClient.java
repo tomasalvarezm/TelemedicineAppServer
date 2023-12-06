@@ -12,19 +12,25 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import telemedicineApp.jdbc.JDBCManager;
+import telemedicineApp.jdbc.JDBCPatientManager;
 import telemedicineApp.pojos.Patient;
 
 public class ServerThreadsClient implements Runnable {
 
 	private Socket socket;
-	InputStream inputStream;
-	OutputStream outputStream;
-	ObjectOutputStream objectOutput;
-	ObjectInputStream objectInput;
-	// private int byteRead;
+	private InputStream inputStream;
+	private OutputStream outputStream;
+	private ObjectOutputStream objectOutput;
+	private ObjectInputStream objectInput;
+
+	private JDBCManager dataBaseManager;
+	private JDBCPatientManager patientManager;
 
 	public ServerThreadsClient(Socket socket) {
 		this.socket = socket;
+		this.dataBaseManager = new JDBCManager();
+		this.patientManager = new JDBCPatientManager(dataBaseManager);
 	}
 
 	@Override
@@ -36,12 +42,11 @@ public class ServerThreadsClient implements Runnable {
         objectInput = null;
 		
 		try {
+			
 			inputStream = socket.getInputStream();
 			outputStream = socket.getOutputStream();
 			objectInput = new ObjectInputStream(inputStream);
 			objectOutput = new ObjectOutputStream(outputStream);
-			
-			
 			
             switch(getRole(objectInput)){
 
@@ -51,33 +56,22 @@ public class ServerThreadsClient implements Runnable {
                 	if (function.equals("register")) {
                 		
                 	}
-                	if (function.equals("login"){
-                		
+                	if (function.equals("login")){
+                		objectOutput.writeObject(getPatientFromID(objectInput));
                 	}
-                	MedicalHistory history = obj2.readObject(); 
-                    JDBCServerManager.saveData(history);
                     break;
                 
                 //doctor     
-                case 1:
-                	ArrayList<Patient> patientsfromdoctor = new ArrayList <Patient>();
-                    patientsfromdoctor = JDBCDoctorManager.listPatientsByDoctorId(clientid);
-                    for(Patient p : patientsfromdoctor){
-                    	obj.writeObject(p)
-                    }
-                
-
-            //case doesn't exist (REGISTER AS DOCTOR OR PATIENT)
-                default:	
-
-               
+                case 1:	
+                	
+            }
 			
-			
-		 catch (IOException | ClassNotFoundException ex) {
+		} catch (IOException | ClassNotFoundException ex) {
             Logger.getLogger(ServerThreadsClient.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             releaseResourcesClient(inputStream, socket);
         }
+	}
 
 	private static void releaseResourcesClient(InputStream inputStream, Socket socket) {
 		try {
@@ -101,8 +95,15 @@ public class ServerThreadsClient implements Runnable {
 			return 1;
 
 	}
+
 	private String getFunction(ObjectInputStream objInput) throws ClassNotFoundException, IOException {
 		return (String) objInput.readObject();
+	}
+
+	private Patient getPatientFromID(ObjectInputStream objInput) throws ClassNotFoundException, IOException {
+		String id = (String) objInput.readObject();
+		Patient patient = patientManager.getPatientById(id);
+		return patient;
 	}
 
 }
