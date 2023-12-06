@@ -17,10 +17,9 @@ public class Patient implements Serializable{
 	private Integer age;
 	private Sex sex;
 	private Integer phoneNumber;
-	private ArrayList<Symptom> symptoms;
-	private Medication medication;
+	private ArrayList <MedicalHistory> medhists;
+	private ArrayList<BitalinoSignal> allsignals;
 	private Doctor doctor;
-	
 	
 	//CONSTRUCTORS
 	
@@ -28,50 +27,22 @@ public class Patient implements Serializable{
 		super();
 	}
 	
-	
-	public Patient(String id, String name, String email, Integer age, Sex sex, Integer phoneNumber) {
+	public Patient(String id, String name, String email, LocalDate dob, Integer age, Sex sex, Integer phoneNumber,
+			ArrayList<MedicalHistory> medhists, ArrayList<BitalinoSignal> allsignals, Doctor doctor) {
 		super();
 		this.id = id;
 		this.name = name;
 		this.email = email;
+		this.dob = dob;
 		this.age = age;
 		this.sex = sex;
 		this.phoneNumber = phoneNumber;
-	}
-	
-	
-	public Patient(String id, String name, String email, Integer age, Sex sex, Integer phoneNumber,
-			ArrayList<Symptom> symptoms, Medication medication) {
-		super();
-		this.id = id;
-		this.name = name;
-		this.email = email;
-		this.age = age;
-		this.sex = sex;
-		this.phoneNumber = phoneNumber;
-		this.symptoms = symptoms;
-		this.medication = medication;
-	}
-	
-	
-	public Patient(String id, String name, String email, Integer age, Sex sex, Integer phoneNumber,
-			ArrayList<Symptom> symptoms, Medication medication, Doctor doctor) {
-		super();
-		this.id = id;
-		this.name = name;
-		this.email = email;
-		this.age = age;
-		this.sex = sex;
-		this.phoneNumber = phoneNumber;
-		this.symptoms = symptoms;
-		this.medication = medication;
-		this.doctor=doctor;
+		this.medhists = medhists;
+		this.allsignals = allsignals;
+		this.doctor = doctor;
 	}
 
 
-
-	//GETTERS AND SETTERS
-	
 	public String getId() {
 		return id;
 	}
@@ -100,8 +71,8 @@ public class Patient implements Serializable{
 	public void setEmail(String email) {
 		this.email = email;
 	}
-	
-	
+
+
 	public LocalDate getDob() {
 		return dob;
 	}
@@ -142,25 +113,24 @@ public class Patient implements Serializable{
 	}
 
 
-	public ArrayList<Symptom> getSymptoms() {
-		return symptoms;
+	public ArrayList<MedicalHistory> getMedhists() {
+		return medhists;
 	}
 
 
-	public void setSymptoms(ArrayList<Symptom> symptoms) {
-		this.symptoms = symptoms;
+	public void setMedhists(ArrayList<MedicalHistory> medhists) {
+		this.medhists = medhists;
 	}
 
 
-	public Medication getMedication() {
-		return medication;
+	public ArrayList<BitalinoSignal> getAllsignals() {
+		return allsignals;
 	}
 
 
-	public void setMedication(Medication medication) {
-		this.medication = medication;
+	public void setAllsignals(ArrayList<BitalinoSignal> allsignals) {
+		this.allsignals = allsignals;
 	}
-
 
 
 	public Doctor getDoctor() {
@@ -172,14 +142,5 @@ public class Patient implements Serializable{
 		this.doctor = doctor;
 	}
 
-
-	@Override
-	public String toString() {
-		return "Patient [id=" + id + ", name=" + name + ", email=" + email + ", dob=" + dob + ", age=" + age + ", sex="
-				+ sex + ", phoneNumber=" + phoneNumber + ", symptoms=" + symptoms + ", medication=" + medication
-				+ ", doctor=" + doctor + "]";
-	}
-	
-	
 
 }
