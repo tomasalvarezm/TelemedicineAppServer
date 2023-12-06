@@ -54,7 +54,7 @@ public class ServerThreadsClient implements Runnable {
                 case 0: 
                 	String function = getFunction(objectInput);
                 	if (function.equals("register")) {
-                		
+                		objectOutput.writeBoolean(registerPatient(objectInput));
                 	}
                 	if (function.equals("login")){
                 		objectOutput.writeObject(getPatientFromID(objectInput));
@@ -72,6 +72,7 @@ public class ServerThreadsClient implements Runnable {
             releaseResourcesClient(inputStream, socket);
         }
 	}
+	
 
 	private static void releaseResourcesClient(InputStream inputStream, Socket socket) {
 		try {
@@ -86,6 +87,7 @@ public class ServerThreadsClient implements Runnable {
 			Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
 		}
 	}
+	
 
 	private int getRole(ObjectInputStream objInput) throws ClassNotFoundException, IOException {
 		String role = (String) objInput.readObject();
@@ -93,12 +95,20 @@ public class ServerThreadsClient implements Runnable {
 			return 0;
 		} else
 			return 1;
-
 	}
+	
 
 	private String getFunction(ObjectInputStream objInput) throws ClassNotFoundException, IOException {
 		return (String) objInput.readObject();
 	}
+	
+	
+	private boolean registerPatient(ObjectInputStream objInput) throws ClassNotFoundException, IOException {
+		Patient patient = (Patient) objInput.readObject();
+		patientManager.insertPatient(patient);
+		return true; //insertPatient(patient) should return true instead??
+	}
+	
 
 	private Patient getPatientFromID(ObjectInputStream objInput) throws ClassNotFoundException, IOException {
 		String id = (String) objInput.readObject();
