@@ -8,5 +8,5 @@ import telemedicineApp.pojos.Symptom;
 public interface SymptomManager {
 
 	public ArrayList<Symptom> getSymptomsFromMedHistId(Integer mh_id);
-	public void uploadSymptomToMedicalHistory(MedicalHistory mh, Symptom s);
+	public void uploadSymptomsToMedicalHistory(Integer medhist_id, ArrayList<Symptom> symptoms);
 }

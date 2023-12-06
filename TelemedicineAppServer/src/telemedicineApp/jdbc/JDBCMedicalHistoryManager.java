@@ -67,11 +67,9 @@ public class JDBCMedicalHistoryManager implements MedicalHistoryManager {
 			prep.setDate(3, Date.valueOf(mh.getDate_medhist()));
 			prep.setString(4, mh.getPatient_id());
 			ArrayList<Symptom> symps= mh.getSymptoms();
-			while (i<symps.size()) {
-				Symptom s = symps.get(i);
-				sm.uploadSymptomToMedicalHistory(mh, s);
-				i++;
-			}
+			
+			sm.uploadSymptomsToMedicalHistory(mh.getId(), symps);
+			
 			prep.executeUpdate();
 
 		} catch (Exception ex) {

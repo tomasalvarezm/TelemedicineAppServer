@@ -44,23 +44,6 @@ public class JDBCBitalinoSignalManager implements BitalinoSignalManager {
 		}
 		return signals;
 	}
-
-	public void uploadSignal (BitalinoSignal signal) {
-		try {
-			String sql = "INSERT INTO BitalinoSignal (id, patient_id, signal_duration, date_signal, filePath) VALUES (?,?,?,?,?)";
-			PreparedStatement prep = manager.getConnection().prepareStatement(sql);
-			prep.setInt(1,signal.getId());
-			prep.setString(2, signal.getPatient_id());
-			prep.setString(3, signal.getSignal_duration() );
-			prep.setDate(4, Date.valueOf(signal.getDateSignal()));
-			prep.setString(5, signal.getFilePath());
-			prep.executeUpdate();
-
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-	}
-	
 	
 	public void saveSignal (BitalinoSignal bs) {
 		try {

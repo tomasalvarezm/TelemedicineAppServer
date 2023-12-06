@@ -36,19 +36,21 @@ public class JDBCSymptomManager implements SymptomManager{
 		}
 		return symptoms;
 	}
+	
 
-	public void uploadSymptomToMedicalHistory(MedicalHistory mh, Symptom s) {
-		try {
-			String sql = "INSERT INTO MedicalHistoryHasSymptoms (medhist_id, symptom_name) VALUES (?,?)";
-			PreparedStatement prep = manager.getConnection().prepareStatement(sql);
-			prep.setInt(1, mh.getId());
-			prep.setString(2, s.getName());
-			prep.executeUpdate();
+	public void uploadSymptomsToMedicalHistory(Integer medhist_id, ArrayList<Symptom> symptoms) {
+		for(Symptom s : symptoms) {
+			try {
+				String sql = "INSERT INTO MedicalHistoryHasSymptoms (medhist_id, symptom_name) VALUES (?,?)";
+				PreparedStatement prep = manager.getConnection().prepareStatement(sql);
+				prep.setInt(1, medhist_id);
+				prep.setString(2, s.getName());
+				prep.executeUpdate();
 
-		} catch (Exception ex) {
-			ex.printStackTrace();
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
 		}
-		
 	}
 
 }
