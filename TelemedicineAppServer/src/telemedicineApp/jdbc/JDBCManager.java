@@ -52,7 +52,7 @@ public class JDBCManager {
 					+ "doctor_id TEXT REFERENCES Doctor(id), PRIMARY KEY(id))";
 			stm.executeUpdate(sql);
 		
-			sql = "CREATE TABLE Symptom" + "(name TEXT UNIQUE, PRIMARY KEY(id AUTOINCREMENT))";
+			sql = "CREATE TABLE Symptom" + "(name TEXT UNIQUE, PRIMARY KEY(name))";
 			stm.executeUpdate(sql);
 			
 			sql = "CREATE TABLE MedicalHistory" + "(id INTEGER UNIQUE, medication TEXT, date_medhist DATE, patient_id TEXT REFERENCES Patient(id), PRIMARY KEY(id AUTOINCREMENT))";

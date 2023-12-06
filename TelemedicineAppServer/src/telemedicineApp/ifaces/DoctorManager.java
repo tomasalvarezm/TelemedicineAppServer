@@ -9,8 +9,8 @@ import telemedicineApp.pojos.Patient;
 
 public interface DoctorManager {
 	
-	public Doctor getDoctorById(String doctor_id);
+	public Doctor getDoctorById(String doctor_id); //funciona
 	public void insertDoctor(Doctor d);
-	public ArrayList<Patient> listPatientsByDoctorId(String doctor_id);
+	public ArrayList<Patient> listPatientsByDoctorId(String doctor_id); //funciona
 
 }
