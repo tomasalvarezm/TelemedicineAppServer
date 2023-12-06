@@ -19,6 +19,7 @@ import telemedicineApp.jdbc.JDBCMedicalHistoryManager;
 import telemedicineApp.jdbc.JDBCPatientManager;
 import telemedicineApp.jdbc.JDBCSymptomManager;
 import telemedicineApp.pojos.BitalinoSignal;
+import telemedicineApp.pojos.MedicalHistory;
 import telemedicineApp.pojos.Patient;
 import telemedicineApp.pojos.Symptom;
 
@@ -130,7 +131,7 @@ public class ServerThreadsClient implements Runnable {
 	private boolean registerPatient(ObjectInputStream objInput) throws ClassNotFoundException, IOException {
 		Patient patient = (Patient) objInput.readObject();
 		patientManager.insertPatient(patient);
-		return true; // insertPatient(patient) should return true instead??
+		return true; // method insertPatient(patient) should return true instead??
 	}
 
 	private Patient getPatientFromID(ObjectInputStream objInput) throws ClassNotFoundException, IOException {
@@ -146,9 +147,8 @@ public class ServerThreadsClient implements Runnable {
 	}
 	
 	private boolean uploadSymptoms(ObjectInputStream objInput) throws ClassNotFoundException, IOException {
-		Integer medHistID = (Integer) objectInput.readObject();
-		ArrayList<Symptom> symptoms = (ArrayList<Symptom>) objInput.readObject();
-		symptomManager.uploadSymptomsToMedicalHistory(medHistID, symptoms);
+		MedicalHistory medicalHistory = (MedicalHistory) objectInput.readObject();
+		medicalHistoryManager.uploadMedicalHistory(medicalHistory);
 		return true;
 	}
 	

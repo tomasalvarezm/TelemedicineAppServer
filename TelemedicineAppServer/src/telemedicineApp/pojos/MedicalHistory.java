@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 
 public class MedicalHistory {
-	private Integer id;
+	
 	private ArrayList<Symptom> symptoms;
 	private LocalDate date_medhist;
 	private Medication medication;
@@ -15,10 +15,9 @@ public class MedicalHistory {
 		super();
 	}
 	
-	public MedicalHistory(Integer id, ArrayList<Symptom> symptoms, LocalDate date_medhist, Medication medication,
+	public MedicalHistory(ArrayList<Symptom> symptoms, LocalDate date_medhist, Medication medication,
 			String patient_id) {
 		super();
-		this.id = id;
 		this.symptoms = symptoms;
 		this.date_medhist = date_medhist;
 		this.medication = medication;
@@ -48,14 +47,6 @@ public class MedicalHistory {
 	
 	public void setPatient_id(String patient_id) {
 		this.patient_id = patient_id;
-	}
-
-	public Integer getId() {
-		return id;
-	}
-
-	public void setId(Integer id) {
-		this.id = id;
 	}
 
 	public LocalDate getDate_medhist() {

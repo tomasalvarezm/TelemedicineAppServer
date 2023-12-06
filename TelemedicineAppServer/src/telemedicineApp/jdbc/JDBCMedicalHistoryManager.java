@@ -3,6 +3,7 @@ package telemedicineApp.jdbc;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
@@ -45,7 +46,7 @@ public class JDBCMedicalHistoryManager implements MedicalHistoryManager {
 				medication=Medication.PRAMIPEXOL;
 			}
 			LocalDate date_medhist= rs.getDate("date_medhist").toLocalDate();			
-			MedicalHistory mh = new MedicalHistory(mh_id,symps, date_medhist, medication,patient_id);
+			MedicalHistory mh = new MedicalHistory(symps, date_medhist, medication,patient_id);
 			medhists.add(mh);
 		}
 		rs.close();
@@ -58,22 +59,37 @@ public class JDBCMedicalHistoryManager implements MedicalHistoryManager {
 	}
 	
 	public void uploadMedicalHistory (MedicalHistory mh) {
-		int i=0;
 		try {
-			String sql = "INSERT INTO MedicalHistory (id, medication, date_medhist, patient_id) VALUES (?,?,?,?)";
+			String sql = "INSERT INTO MedicalHistory (medication, date_medhist, patient_id) VALUES (?,?,?)";
 			PreparedStatement prep = manager.getConnection().prepareStatement(sql);
-			prep.setFloat(1, mh.getId());
-			prep.setString(2, mh.getMedication().toString());
-			prep.setDate(3, Date.valueOf(mh.getDate_medhist()));
-			prep.setString(4, mh.getPatient_id());
-			ArrayList<Symptom> symps= mh.getSymptoms();
-			
-			sm.uploadSymptomsToMedicalHistory(mh.getId(), symps);
+			prep.setString(1, mh.getMedication().toString());
+			prep.setDate(2, Date.valueOf(mh.getDate_medhist()));
+			prep.setString(3, mh.getPatient_id());
 			
 			prep.executeUpdate();
-
+			
+			int medicalHistoryID = getMedicalHistoryID(mh);
+			sm.uploadSymptomsToMedicalHistory(medicalHistoryID, mh.getSymptoms());
+			
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
+	}
+	private int getMedicalHistoryID(MedicalHistory medicalHistory) {
+		Integer medHistID = null;
+		try {
+			String sql = "SELECT id FROM MedicalHistory WHERE patient_id = ? AND date_medhist = ?";
+			PreparedStatement prep = manager.getConnection().prepareStatement(sql);
+			prep.setString(1, medicalHistory.getPatient_id());
+			prep.setDate(2, Date.valueOf(medicalHistory.getDate_medhist()));
+			ResultSet rs = prep.executeQuery();
+			medHistID = rs.getInt("id");
+			
+			rs.close();
+			prep.close();
+		} catch (SQLException ex) {
+			ex.printStackTrace();
+		}
+		return medHistID;
 	}
 }
