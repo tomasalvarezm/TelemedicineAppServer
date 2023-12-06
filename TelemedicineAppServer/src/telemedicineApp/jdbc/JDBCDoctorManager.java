@@ -5,52 +5,64 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.List;
+
+
 import telemedicineApp.ifaces.DoctorManager;
-import telemedicineApp.pojos.*;
+import telemedicineApp.pojos.Doctor;
+import telemedicineApp.pojos.Patient;
+import telemedicineApp.pojos.Sex;
 
 public class JDBCDoctorManager implements DoctorManager{
 
 	private JDBCManager manager;
-	private JDBCSymptomManager sman;
+	private JDBCPatientManager pm;
 
 
-	public JDBCDoctorManager(JDBCManager m) {
+	public JDBCDoctorManager(JDBCManager m,JDBCPatientManager pm) {
 		this.manager = m;
+		this.pm = pm;
+		
 	}
-	//TODO probar
-	public ArrayList<Patient> listPatientsByDoctorId(String id) {
-		ArrayList<Patient> patients = new ArrayList<Patient>();
+	
+	public Doctor getDoctorById(String doctor_id) {
+		Doctor doc=null;
 		Sex sexo=null;
-		Medication med=null;
+		
+		try {
+			String sql = "SELECT * FROM Doctor WHERE id = ?";
+			PreparedStatement prep = manager.getConnection().prepareStatement(sql);
+			prep.setString(1, doctor_id);
+			ResultSet rs = prep.executeQuery();
+			String name = rs.getString("name");
+			String sex = rs.getString("sex");
+			if(sex=="MALE") {
+				sexo=Sex.MALE;
+			}
+			else {
+				sexo=Sex.FEMALE;
+			}
+			ArrayList <Patient> patientsList = listPatientsByDoctorId(doctor_id);
+			doc= new Doctor(doctor_id,name,sexo,patientsList);	
+			
+			rs.close();
+			prep.close();
+		} catch (SQLException ex) {
+			ex.printStackTrace();
+		}
+		return doc;
+	}
+
+	public ArrayList<Patient> listPatientsByDoctorId(String doctor_id) {
+		ArrayList<Patient> patients = new ArrayList<Patient>();
 		try {
 			Statement stat = manager.getConnection().createStatement();
-			String sql = "SELECT * FROM Patient WHERE doctor_id=?" ;
+			String sql = "SELECT * FROM Patient WHERE doctor_id= ?";
+			PreparedStatement prep = manager.getConnection().prepareStatement(sql);
+			prep.setString(1, doctor_id);
 			ResultSet rs = stat.executeQuery(sql);
 			while (rs.next()) {
-				String pat_id = rs.getString("id");
-				String name = rs.getString("name");
-				String email = rs.getString("email");
-				Integer age = rs.getInt("age");
-				String sex = rs.getString("sex");
-				String meds=rs.getString("medication");
-				
-				if (sex=="MALE") {
-					 sexo=Sex.MALE;
-				}else {
-					sexo=Sex.FEMALE;
-				}
-				Integer phoneNumber = rs.getInt("phoneNumber");
-				
-				if (meds=="LEVODOPA") {
-					 med=Medication.LEVODOPA;
-				}else {
-					med=Medication.PRAMIPEXOL;
-				}
-				//TODO revisar aquí
-				ArrayList <Symptom> symps = sman.getSymptomsFromPatientId(id);
-				
-				Patient p = new Patient(pat_id, name, email, age, sexo, phoneNumber, symps, med);
+				String patient_id = rs.getString("id");
+				Patient p = pm.getPatientById(patient_id);
 				patients.add(p);
 			}
 			rs.close();
@@ -64,9 +76,11 @@ public class JDBCDoctorManager implements DoctorManager{
 	public void insertDoctor(Doctor d) {
 		
 		try {
-			String sql = "INSERT INTO Doctor (id) VALUES (?)";
+			String sql = "INSERT INTO Doctor (id,name,sex) VALUES (?,?,?)";
 			PreparedStatement prep = manager.getConnection().prepareStatement(sql);
 			prep.setString(1, d.getId());
+			prep.setString(2, d.getName());
+			prep.setString(3,d.getSex().toString());
 			prep.executeUpdate();
 
 		} catch (Exception ex) {
@@ -74,26 +88,6 @@ public class JDBCDoctorManager implements DoctorManager{
 		}
 	}
 	
-	//TODO Probar si funciona
-	public Doctor getDoctorById(String id) {
-		Doctor doc=null;
-		Patient patient = null;
-		Sex sexo=null;
-		try {
-			String sql = "SELECT * FROM Doctor WHERE id = ?";
-			PreparedStatement prep = manager.getConnection().prepareStatement(sql);
-			prep.setString(1, id);
-			ResultSet rs = prep.executeQuery();
-			String name = rs.getString("name");
-			ArrayList <Patient> patientsList = listPatientsByDoctorId(id);
-			doc= new Doctor(id,patientsList);	
-			rs.close();
-			prep.close();
-		} catch (SQLException ex) {
-			ex.printStackTrace();
-		}
-		return doc;
-	}
-	
+
 
 }

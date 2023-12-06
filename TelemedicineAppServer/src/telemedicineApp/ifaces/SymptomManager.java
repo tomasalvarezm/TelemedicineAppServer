@@ -1,13 +1,12 @@
 package telemedicineApp.ifaces;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 
+import telemedicineApp.pojos.MedicalHistory;
 import telemedicineApp.pojos.Symptom;
 
 public interface SymptomManager {
-	public void insertSymptom(Symptom s);
-	public Symptom getSymptomByName(String name);
-	public ArrayList<Symptom> getSymptomsFromPatientId(String id);
-	
+
+	public ArrayList<Symptom> getSymptomsFromMedHistId(Integer mh_id);
+	public void uploadSymptomToMedicalHistory(MedicalHistory mh, Symptom s);
 }

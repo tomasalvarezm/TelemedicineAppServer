@@ -5,7 +5,6 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-
 public class JDBCManager {
 
 	private Connection c = null;
@@ -44,33 +43,36 @@ public class JDBCManager {
 		// Create Tables
 		try {
 			Statement stm = c.createStatement();
-			String sql = "CREATE TABLE Patient" + "(id TEXT UNIQUE, name TEXT, email TEXT UNIQUE,"
-					+ " age INTEGER, sex TEXT, phoneNumber INTEGER, medication TEXT, doctor_id TEXT REFERENCES Doctor(id), PRIMARY KEY(id))";
+			
+			String sql = "CREATE TABLE Doctor" + "(id TEXT UNIQUE, name TEXT, sex TEXT, PRIMARY KEY(id))";
 			stm.executeUpdate(sql);
 			
-			sql = "CREATE TABLE Symptom" + "(name TEXT,date DATE, PRIMARY KEY(name))";
+			sql = "CREATE TABLE Patient" + "(id TEXT UNIQUE, name TEXT, email TEXT UNIQUE,"
+					+ "dob DATE, age INTEGER, sex TEXT, phoneNumber INTEGER,  "
+					+ "doctor_id TEXT REFERENCES Doctor(id), PRIMARY KEY(id))";
+			stm.executeUpdate(sql);
+		
+			sql = "CREATE TABLE Symptom" + "(name TEXT UNIQUE, PRIMARY KEY(id AUTOINCREMENT))";
 			stm.executeUpdate(sql);
 			
-			sql = "CREATE TABLE PatientHasSymptoms" + "(patient_id TEXT REFERENCES Patient(id),"
-					+ " symptom_name TEXT REFERENCES Symptom(name), PRIMARY KEY (patient_id, symptom_name))";
+			sql = "CREATE TABLE MedicalHistory" + "(id INTEGER UNIQUE, medication TEXT, date_medhist DATE, patient_id TEXT REFERENCES Patient(id), PRIMARY KEY(id AUTOINCREMENT))";
 			stm.executeUpdate(sql);
 			
-			
-			sql = "CREATE TABLE SignalRecord" + "(signal_id INTEGER UNIQUE, patient_id TEXT, patient_name TEXT, signal_duration TEXT,"
-					+ " date DATE, data BLOB, PRIMARY KEY(signal_id AUTOINCREMENT))";
+			sql = "CREATE TABLE MedicalHistoryHasSymptoms" + "(medhist_id TEXT REFERENCES MedicalHistory(id),"
+					+ " symptom_name TEXT REFERENCES Symptom(name), PRIMARY KEY (medhist_id, symptom_name))";
 			stm.executeUpdate(sql);
 			
-			sql = "CREATE TABLE Doctor" + "(id TEXT UNIQUE, PRIMARY KEY(id))";
+			sql = "CREATE TABLE BitalinoSignal" + "(id INTEGER UNIQUE, patient_id TEXT REFERENCES Patient(id), signal_duration TEXT,"
+					+ " date_signal DATE, filePath TEXT, PRIMARY KEY(id AUTOINCREMENT))";
 			stm.executeUpdate(sql);
 			
-
 
 		} catch (SQLException e) {
 			// Do not complain if tables already exist
 			if (!e.getMessage().contains("already exists")) { 
 				e.printStackTrace();
 			}
-		}
+		} 
 		
 	}
 	
