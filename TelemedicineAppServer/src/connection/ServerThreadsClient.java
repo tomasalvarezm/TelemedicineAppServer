@@ -12,121 +12,98 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import telemedicineApp.jdbc.JDBCManager;
+import telemedicineApp.jdbc.JDBCPatientManager;
+import telemedicineApp.pojos.Patient;
 
 public class ServerThreadsClient implements Runnable {
 
 	private Socket socket;
-	private int byteRead;
+	private InputStream inputStream;
+	private OutputStream outputStream;
+	private ObjectOutputStream objectOutput;
+	private ObjectInputStream objectInput;
+
+	private JDBCManager dataBaseManager;
+	private JDBCPatientManager patientManager;
 
 	public ServerThreadsClient(Socket socket) {
 		this.socket = socket;
+		this.dataBaseManager = new JDBCManager();
+		this.patientManager = new JDBCPatientManager(dataBaseManager);
 	}
-	
-	
-//TODO add lo referente a bitalino
 
-//TODO revisar bien que hace esto. Nuestro server: manda patient, recibe patient y doctor, manda bitalino, recibe bitalino.
-	
 	@Override
 	public void run() {
-		
-		InputStream inputStream = null;
-		OutputStream outputStream = null;
+		//server sends and receives info
+		inputStream = null;
+		outputStream = null;
+		objectOutput = null;
+        objectInput = null;
 		
 		try {
-			inputStream = socket.getInputStream();
-			//outputStream = socket.getOutputStream();
 			
-			ArrayList<Integer> physioParamFromPatient = readDataFromBitalino(inputStream);
-			System.out.println(physioParamFromPatient);
+			inputStream = socket.getInputStream();
+			outputStream = socket.getOutputStream();
+			objectInput = new ObjectInputStream(inputStream);
+			objectOutput = new ObjectOutputStream(outputStream);
+			
+            switch(getRole(objectInput)){
+
+            	//patient
+                case 0: 
+                	String function = getFunction(objectInput);
+                	if (function.equals("register")) {
+                		
+                	}
+                	if (function.equals("login")){
+                		objectOutput.writeObject(getPatientFromID(objectInput));
+                	}
+                    break;
+                
+                //doctor     
+                case 1:	
+                	
+            }
 			
 		} catch (IOException | ClassNotFoundException ex) {
             Logger.getLogger(ServerThreadsClient.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             releaseResourcesClient(inputStream, socket);
         }
-		
-		//OutputStream os=null;
-		
-		/*public Patient readPatients() {
-			
-			Patient patient=null;
-				
-			Object object=null;
-			try {
-				object = objectInput.readObject();
-				//TODO revisar excepciones
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			//instanceof lo utilizamos para comprobar si el objeto recibido 
-			//es de la clase que se indica posteriormente.
-			if(object instanceof Patient) {
-				patient= (Patient) object;
-			}
-			}
-			return patient;
-		}
-		
-		// TODO Auto-generated method stub
-		//cuando server recibe y cuando manda
-		try {
-			
-		}
-		catch (Exception ex) {
-			
-		}*/
-		
 	}
-	
-	
-	private ArrayList<Integer> readDataFromBitalino(InputStream inputStream) throws IOException, ClassNotFoundException{
-		/*ArrayList<Integer> values = new ArrayList<Integer>();
-		DataInputStream dataInput = new DataInputStream(inputStream);
-		while((byteRead = inputStream.read()) != -1) {
-			Integer value = (Integer) byteRead;
-			values.add(value);
-		}
-		return values;*/
-		ObjectInputStream objectInput = new ObjectInputStream(inputStream);
-		ArrayList<Integer> data = (ArrayList<Integer>) objectInput.readObject();
-		return data;
-	}
-	
+
 	private static void releaseResourcesClient(InputStream inputStream, Socket socket) {
-        try {
-            inputStream.close();
-        } catch (IOException ex) {
-            Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
-        }
+		try {
+			inputStream.close();
+		} catch (IOException ex) {
+			Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+		}
 
-        try {
-            socket.close();
-        } catch (IOException ex) {
-            Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-	
-	/*private static void releaseResourcesClient(ObjectOutputStream objectOutput, ObjectInputStream objectInput, Socket socket) {
-        try {
-            objectInput.close();
-        } catch (IOException ex) {
-            Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        try {
-            objectOutput.close();
-        } catch (IOException ex) {
-            Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
-        }
+		try {
+			socket.close();
+		} catch (IOException ex) {
+			Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+		}
+	}
 
-        try {
-            socket.close();
-        } catch (IOException ex) {
-            Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }*/
+	private int getRole(ObjectInputStream objInput) throws ClassNotFoundException, IOException {
+		String role = (String) objInput.readObject();
+		if (role.equalsIgnoreCase("patient")) {
+			return 0;
+		} else
+			return 1;
+
+	}
+
+	private String getFunction(ObjectInputStream objInput) throws ClassNotFoundException, IOException {
+		return (String) objInput.readObject();
+	}
+
+	private Patient getPatientFromID(ObjectInputStream objInput) throws ClassNotFoundException, IOException {
+		String id = (String) objInput.readObject();
+		Patient patient = patientManager.getPatientById(id);
+		return patient;
+	}
+
 }
-
-
