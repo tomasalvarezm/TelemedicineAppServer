@@ -1,5 +1,7 @@
 package telemedicineApp.ifaces;
 
+import java.util.ArrayList;
+
 import telemedicineApp.pojos.Patient;
 
 public interface PatientManager {
