@@ -30,6 +30,7 @@ public class JDBCDoctorManager implements DoctorManager{
 		this.mhm = mhm;
 		this.bsm = bsm;
 	}
+	
 
 	public Doctor getDoctorById(String doctor_id) {
 		Doctor doc=null;
@@ -107,6 +108,7 @@ public class JDBCDoctorManager implements DoctorManager{
 		return patients;
 	}
 
+	
 	public void insertDoctor(Doctor d) {
 		
 		try {
