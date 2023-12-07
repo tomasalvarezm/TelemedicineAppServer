@@ -76,22 +76,22 @@ public class ServerThreadsClient implements Runnable {
 					//register
 					case 0:
 						System.out.println("Antes de registrar");
-						boolean b=registerPatient(objectInput);
-						System.out.println(b);
-						objectOutput.writeBoolean(b);
+						objectOutput.writeBoolean(registerPatient(objectInput));
 						objectOutput.flush();
 						System.out.println("Despues de registrar");
-
 						break;
 					
 					//login
 					case 1:
 						try {
 							objectOutput.writeObject(getPatientFromID(objectInput));
+							objectOutput.flush();
 						} catch (SQLException e) {
 							objectOutput.writeObject(null);
+							objectOutput.flush();
+							break;
 						}
-						objectOutput.flush();
+						
 						boolean login = true;
 						while(login) {
 							switch(getPatientFunction(objectInput)) {
@@ -177,14 +177,27 @@ public class ServerThreadsClient implements Runnable {
 			return 1;
 		} else
 			return 2;
-
 	}
+	
+	/*private int getDoctorFunction(ObjectInputStream objInput) throws ClassNotFoundException, IOException {
+		String function = (String) objInput.readObject();
+		if (function.equalsIgnoreCase("")) {
+			return 0;
+		} else if (function.equalsIgnoreCase("")) {
+			return 1;
+		} else
+			return 2;
+	}*/
 
 	// PATIENT FUNCTIONALITIES
 	private boolean registerPatient(ObjectInputStream objInput) throws ClassNotFoundException, IOException {
 		Patient patient = (Patient) objInput.readObject();
 		System.out.println(patient);
-		patientManager.insertPatient(patient);
+		try {
+			patientManager.insertPatient(patient);
+		} catch(SQLException ex) {
+			return false;
+		}
 		return true; // method insertPatient(patient) should return true instead??
 	}
 
@@ -205,13 +218,21 @@ public class ServerThreadsClient implements Runnable {
 			fileWriter.write(value);
 		}
 		fileWriter.close();
-		bitalinoSignalManager.saveSignal(bitalinoSignal);
+		try {
+			bitalinoSignalManager.saveSignal(bitalinoSignal);
+		} catch(SQLException ex) {
+			return false;
+		}
 		return true;
 	}
 
 	private boolean uploadSymptoms(ObjectInputStream objInput) throws ClassNotFoundException, IOException {
 		MedicalHistory medicalHistory = (MedicalHistory) objectInput.readObject();
-		medicalHistoryManager.uploadMedicalHistory(medicalHistory);
+		try {
+			medicalHistoryManager.uploadMedicalHistory(medicalHistory);
+		} catch(SQLException ex) {
+			return false;
+		}
 		return true;
 	}
 
