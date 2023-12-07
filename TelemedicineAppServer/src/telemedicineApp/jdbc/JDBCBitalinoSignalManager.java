@@ -20,27 +20,23 @@ public class JDBCBitalinoSignalManager implements BitalinoSignalManager {
 		this.manager = manager;
 	}
 
-	public ArrayList<BitalinoSignal> getSignalsByPatientIdAndDate(String patient_id, LocalDate dateSignal) throws SQLException {
-		ArrayList<BitalinoSignal> signals = new ArrayList<BitalinoSignal>();
+	public BitalinoSignal getBitalinoSignal(String patient_id, LocalDate dateSignal) throws SQLException {
+			BitalinoSignal signal = null;
 
-	
 			String sql = "SELECT * FROM BitalinoSignal WHERE patient_id = ? AND date_signal=?";
 			PreparedStatement prep = manager.getConnection().prepareStatement(sql);
 			prep.setString(1, patient_id);
 			prep.setDate(2,Date.valueOf(dateSignal));
 			ResultSet rs = prep.executeQuery();
-			while (rs.next()) {
-				Integer id = rs.getInt("id");
-				String signal_duration = rs.getString("signal_duration");
-				String filePath = rs.getString("filePath");
-				BitalinoSignal signal = new BitalinoSignal (id, patient_id, signal_duration,dateSignal, filePath);
-				signals.add(signal);
-			}
+			Integer id = rs.getInt("id");
+			String signal_duration = rs.getString("signal_duration");
+			String filePath = rs.getString("filePath");
+			signal = new BitalinoSignal (id, patient_id, signal_duration,dateSignal, filePath);
 			rs.close();
 			prep.close();
 
 		
-		return signals;
+		return signal;
 	}
 	public ArrayList<BitalinoSignal> getSignalsByPatientId(String patient_id) throws SQLException {
 		ArrayList<BitalinoSignal> signals = new ArrayList<BitalinoSignal>();
