@@ -6,6 +6,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
+
 import telemedicineApp.ifaces.PatientManager;
 import telemedicineApp.pojos.*;
 
@@ -38,7 +40,7 @@ public class JDBCPatientManager implements PatientManager{
 			
 			String name = rs.getString("name");
 			String email = rs.getString("email");
-			LocalDate dob= rs.getDate("dob").toLocalDate();
+			Date dob= rs.getDate("dob");
 			Integer age = rs.getInt("age");
 			String sex = rs.getString("sex");
 			if (sex=="MALE") {
@@ -51,8 +53,8 @@ public class JDBCPatientManager implements PatientManager{
 			ArrayList<BitalinoSignal> signals = bsm.getSignalsByPatientId(patient_id);
 			String doctor_id=rs.getString("doctor_id");
 			Doctor doctor= dm.getDoctorById(doctor_id);
-			
-			patient = new Patient(patient_id,name, email, dob, age, sexo, phoneNumber, medhists, signals, doctor);
+			LocalDate d = LocalDate.of(dob.getYear(), dob.getMonth(), dob.getDay());
+			patient = new Patient(patient_id,name, email, d, age, sexo, phoneNumber, medhists, signals, doctor);
 						
 			rs.close();
 			prep.close();
@@ -70,6 +72,7 @@ public class JDBCPatientManager implements PatientManager{
 			prep.setString(1, p.getId());
 			prep.setString(2,p.getName());
 			prep.setString(3,p.getEmail());
+			//TODO esto esta mal
 			prep.setString(4, p.getDob().toString());
 			prep.setInt(5, p.getAge());
 			prep.setString(6, p.getSex().toString());

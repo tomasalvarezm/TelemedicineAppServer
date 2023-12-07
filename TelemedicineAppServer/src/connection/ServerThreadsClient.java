@@ -74,7 +74,12 @@ public class ServerThreadsClient implements Runnable {
 					
 					//register
 					case 0:
-						objectOutput.writeBoolean(registerPatient(objectInput));
+						System.out.println("Antes de registrar");
+						boolean b=registerPatient(objectInput);
+						System.out.println(b);
+						objectOutput.writeBoolean(b);
+						System.out.println("Despues de registrar");
+
 						break;
 					
 					//login
@@ -169,6 +174,7 @@ public class ServerThreadsClient implements Runnable {
 	// PATIENT FUNCTIONALITIES
 	private boolean registerPatient(ObjectInputStream objInput) throws ClassNotFoundException, IOException {
 		Patient patient = (Patient) objInput.readObject();
+		System.out.println(patient);
 		patientManager.insertPatient(patient);
 		return true; // method insertPatient(patient) should return true instead??
 	}
