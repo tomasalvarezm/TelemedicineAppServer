@@ -1,7 +1,8 @@
 package connection;
 
 import java.io.DataInputStream;
-
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -68,24 +69,42 @@ public class ServerThreadsClient implements Runnable {
 
 			// patient
 			case 0:
-				String function = getFunction(objectInput);
-
-				if (function.equals("register")) {
-					objectOutput.writeBoolean(registerPatient(objectInput));
-				}
-				if (function.equals("login")) {
-					objectOutput.writeObject(getPatientFromID(objectInput));
-					String function2 = getFunction(objectInput);
-
-					if (function2.equals("modifysymptoms")) {
-						objectOutput.writeBoolean(uploadSymptoms(objectInput));
+				while(true) {
+					switch(getFunction(objectInput)) {
+					
+					//register
+					case 0:
+						objectOutput.writeBoolean(registerPatient(objectInput));
+						break;
+					
+					//login
+					case 1:
+						objectOutput.writeObject(getPatientFromID(objectInput));
+						boolean login = true;
+						while(login) {
+							switch(getPatientFunction(objectInput)) {
+							
+							//new medical history
+							case 0:
+								objectOutput.writeBoolean(uploadSymptoms(objectInput));
+								break;
+								
+							//new BITalino signal
+							case 1:
+								objectOutput.writeBoolean(saveBitalinoSignal(objectInput));
+								break;
+								
+							//logout
+							case 2:
+								login = false;
+								break;
+							}
+						}
+						break;
 					}
-					if (function2.equals("uploadsignal")) {
-						objectOutput.writeBoolean(saveBitalinoSignal(objectInput));
-					}
 				}
-				break;
-
+				
+				
 			// doctor
 			case 1:
 
@@ -123,8 +142,23 @@ public class ServerThreadsClient implements Runnable {
 	}
 
 	//CLIENT ACTION
-	private String getFunction(ObjectInputStream objInput) throws ClassNotFoundException, IOException {
-		return (String) objInput.readObject();
+	private int getFunction(ObjectInputStream objInput) throws ClassNotFoundException, IOException {
+		String function = (String) objInput.readObject();
+		if(function.equalsIgnoreCase("register")) {
+			return 0;
+		} else 
+			return 1;
+	}
+	
+	private int getPatientFunction(ObjectInputStream objInput) throws ClassNotFoundException, IOException {
+		String function = (String) objInput.readObject();
+		if(function.equalsIgnoreCase("modifysymptoms")) {
+			return 0;
+		} else if(function.equalsIgnoreCase("uploadsignal")) {
+			return 1;
+		} else 
+			return 2;
+			
 	}
 
 	//PATIENT FUNCTIONALITIES
@@ -142,7 +176,16 @@ public class ServerThreadsClient implements Runnable {
 	
 	private boolean saveBitalinoSignal(ObjectInputStream objInput) throws ClassNotFoundException, IOException {
 		BitalinoSignal bitalinoSignal = (BitalinoSignal) objInput.readObject();
+		String pathname = "/Users/elenamacarron/Desktop/TelemedicineProject/TelemedicineAppServer/" + bitalinoSignal.getPatient_id() + bitalinoSignal.getDateSignal();
+		bitalinoSignal.setFilePath(pathname);
+		File file = new File (bitalinoSignal.getFilePath());
+		FileWriter fileWriter = new FileWriter(file);
+		for(Integer value : bitalinoSignal.getData()) {
+			fileWriter.write(value);
+		}
+
 		bitalinoSignalManager.saveSignal(bitalinoSignal);
+		
 		return true;
 	}
 	
