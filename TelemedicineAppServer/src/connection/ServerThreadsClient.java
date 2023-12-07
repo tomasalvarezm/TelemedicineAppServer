@@ -78,6 +78,7 @@ public class ServerThreadsClient implements Runnable {
 						boolean b=registerPatient(objectInput);
 						System.out.println(b);
 						objectOutput.writeBoolean(b);
+						objectOutput.flush();
 						System.out.println("Despues de registrar");
 
 						break;
@@ -85,6 +86,7 @@ public class ServerThreadsClient implements Runnable {
 					//login
 					case 1:
 						objectOutput.writeObject(getPatientFromID(objectInput));
+						objectOutput.flush();
 						boolean login = true;
 						while(login) {
 							switch(getPatientFunction(objectInput)) {
@@ -92,11 +94,13 @@ public class ServerThreadsClient implements Runnable {
 							//new medical history
 							case 0:
 								objectOutput.writeBoolean(uploadSymptoms(objectInput));
+								objectOutput.flush();
 								break;
 								
 							//new BITalino signal
 							case 1:
 								objectOutput.writeBoolean(saveBitalinoSignal(objectInput));
+								objectOutput.flush();
 								break;
 								
 							//logout
@@ -187,7 +191,7 @@ public class ServerThreadsClient implements Runnable {
 
 	private boolean saveBitalinoSignal(ObjectInputStream objInput) throws ClassNotFoundException, IOException {
 		BitalinoSignal bitalinoSignal = (BitalinoSignal) objInput.readObject();
-		String pathname = "/Users/elenamacarron/Desktop/TelemedicineProject/TelemedicineAppServer/"
+		String pathname = "C:\\Users\\User\\Documents\\ServerFiles\\"
 				+ bitalinoSignal.getPatient_id() + bitalinoSignal.getDateSignal();
 		bitalinoSignal.setFilePath(pathname);
 		File file = new File(bitalinoSignal.getFilePath());
