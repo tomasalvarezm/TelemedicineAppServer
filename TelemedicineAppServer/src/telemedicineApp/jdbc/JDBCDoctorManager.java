@@ -36,7 +36,7 @@ public class JDBCDoctorManager implements DoctorManager{
 		Doctor doc=null;
 		Sex sexo=null;
 		
-		try {
+	
 			String sql = "SELECT * FROM Doctor WHERE id = ?";
 			PreparedStatement prep = manager.getConnection().prepareStatement(sql);
 			prep.setString(1, doctor_id);
@@ -54,9 +54,7 @@ public class JDBCDoctorManager implements DoctorManager{
 			
 			rs.close();
 			prep.close();
-		} catch (SQLException ex) {
-			ex.printStackTrace();
-		}
+	
 		return doc;
 	}
 
@@ -65,7 +63,7 @@ public class JDBCDoctorManager implements DoctorManager{
 		Medication med=null;
 		Sex sexo=null;
 		Patient p=null;
-		try {
+	
 			Statement stat = manager.getConnection().createStatement();
 			String sql = "SELECT * FROM Patient WHERE doctor_id= ?";
 			PreparedStatement prep = manager.getConnection().prepareStatement(sql);
@@ -102,16 +100,14 @@ public class JDBCDoctorManager implements DoctorManager{
 			}
 			rs.close();
 			stat.close();
-		} catch (SQLException ex) {
-			ex.printStackTrace();
-		}
+		
 		return patients;
 	}
 
 	
 	public void insertDoctor(Doctor d) throws SQLException {
 		
-		try {
+		
 			String sql = "INSERT INTO Doctor (id,name,sex) VALUES (?,?,?)";
 			PreparedStatement prep = manager.getConnection().prepareStatement(sql);
 			prep.setString(1, d.getId());
@@ -119,9 +115,7 @@ public class JDBCDoctorManager implements DoctorManager{
 			prep.setString(3,d.getSex().toString());
 			prep.executeUpdate();
 
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
+		
 	}
 	
 
