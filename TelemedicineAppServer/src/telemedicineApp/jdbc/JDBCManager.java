@@ -6,6 +6,8 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import javax.swing.JCheckBox;
+
 public class JDBCManager {
 
 	private Connection c = null;
@@ -74,6 +76,38 @@ public class JDBCManager {
 			prep.setString(2, "Elena");
 			prep.setString(3, "FEMALE");
 			prep.executeUpdate();
+			
+			//Insert symptoms
+			sql = "INSERT INTO Symptom (name) VALUES (?)";
+			prep = c.prepareStatement(sql);
+			prep.setString(1, "Drowsiness");
+			prep.executeUpdate();
+			
+			sql = "INSERT INTO Symptom (name) VALUES (?)";
+			prep = c.prepareStatement(sql);
+			prep.setString(1, "Nausea");
+			prep.executeUpdate();
+			
+			sql = "INSERT INTO Symptom (name) VALUES (?)";
+			prep = c.prepareStatement(sql);
+			prep.setString(1, "Swelling");
+			prep.executeUpdate();
+			
+			sql = "INSERT INTO Symptom (name) VALUES (?)";
+			prep = c.prepareStatement(sql);
+			prep.setString(1, "Dizziness");
+			prep.executeUpdate();
+
+			sql = "INSERT INTO Symptom (name) VALUES (?)";
+			prep = c.prepareStatement(sql);
+			prep.setString(1, "Alucinations");
+			prep.executeUpdate();
+
+			sql = "INSERT INTO Symptom (name) VALUES (?)";
+			prep = c.prepareStatement(sql);
+			prep.setString(1, "Lack of appetite");
+			prep.executeUpdate();
+
 
 		} catch (SQLException e) {
 			// Do not complain if tables already exist

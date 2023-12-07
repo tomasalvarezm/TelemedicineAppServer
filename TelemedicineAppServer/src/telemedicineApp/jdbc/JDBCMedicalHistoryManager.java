@@ -27,7 +27,7 @@ public class JDBCMedicalHistoryManager implements MedicalHistoryManager {
 		this.sm = sm;
 	}
 
-	public ArrayList<MedicalHistory> getMedHistoriesByPatientId (String patient_id){
+	public ArrayList<MedicalHistory> getMedHistoriesByPatientId (String patient_id) throws SQLException{
 		ArrayList<MedicalHistory> medhists	= new ArrayList <MedicalHistory>();
 		Medication medication=null;
 		
@@ -58,7 +58,7 @@ public class JDBCMedicalHistoryManager implements MedicalHistoryManager {
 		return medhists;
 	}
 	
-	public void uploadMedicalHistory (MedicalHistory mh) {
+	public void uploadMedicalHistory (MedicalHistory mh) throws SQLException {
 		try {
 			String sql = "INSERT INTO MedicalHistory (medication, date_medhist, patient_id) VALUES (?,?,?)";
 			PreparedStatement prep = manager.getConnection().prepareStatement(sql);
@@ -75,7 +75,7 @@ public class JDBCMedicalHistoryManager implements MedicalHistoryManager {
 			ex.printStackTrace();
 		}
 	}
-	private int getMedicalHistoryID(MedicalHistory medicalHistory) {
+	private int getMedicalHistoryID(MedicalHistory medicalHistory) throws SQLException {
 		Integer medHistID = null;
 		try {
 			String sql = "SELECT id FROM MedicalHistory WHERE patient_id = ? AND date_medhist = ?";

@@ -63,7 +63,7 @@ public class JDBCPatientManager implements PatientManager{
 		
 	}
 	
-	public void insertPatient(Patient p) {
+	public void insertPatient(Patient p) throws SQLException {
 		try {
 			String sql = "INSERT INTO Patient (id, name, email, dob, age, sex, phoneNumber, doctor_id) VALUES (?,?,?,?,?,?,?,?)";
 			PreparedStatement prep = manager.getConnection().prepareStatement(sql);

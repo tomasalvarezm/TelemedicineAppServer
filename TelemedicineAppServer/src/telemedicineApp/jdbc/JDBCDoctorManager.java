@@ -32,7 +32,7 @@ public class JDBCDoctorManager implements DoctorManager{
 	}
 	
 
-	public Doctor getDoctorById(String doctor_id) {
+	public Doctor getDoctorById(String doctor_id) throws SQLException{
 		Doctor doc=null;
 		Sex sexo=null;
 		
@@ -60,7 +60,7 @@ public class JDBCDoctorManager implements DoctorManager{
 		return doc;
 	}
 
-	public ArrayList<Patient> listPatientsByDoctorId(String doctor_id) {
+	public ArrayList<Patient> listPatientsByDoctorId(String doctor_id) throws SQLException {
 		ArrayList<Patient> patients = new ArrayList<Patient>();
 		Medication med=null;
 		Sex sexo=null;
@@ -109,7 +109,7 @@ public class JDBCDoctorManager implements DoctorManager{
 	}
 
 	
-	public void insertDoctor(Doctor d) {
+	public void insertDoctor(Doctor d) throws SQLException {
 		
 		try {
 			String sql = "INSERT INTO Doctor (id,name,sex) VALUES (?,?,?)";

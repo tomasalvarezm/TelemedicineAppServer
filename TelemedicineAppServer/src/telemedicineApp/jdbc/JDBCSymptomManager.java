@@ -2,6 +2,7 @@ package telemedicineApp.jdbc;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import telemedicineApp.ifaces.SymptomManager;
@@ -15,7 +16,7 @@ public class JDBCSymptomManager implements SymptomManager{
 		this.manager = m;
 	}
 	
-	public ArrayList<Symptom> getSymptomsFromMedHistId(Integer mh_id) {
+	public ArrayList<Symptom> getSymptomsFromMedHistId(Integer mh_id) throws SQLException {
 		ArrayList<Symptom> symptoms = new ArrayList<Symptom>();
 
 		try {
@@ -38,7 +39,7 @@ public class JDBCSymptomManager implements SymptomManager{
 	}
 	
 
-	public void uploadSymptomsToMedicalHistory(Integer medhist_id, ArrayList<Symptom> symptoms) {
+	public void uploadSymptomsToMedicalHistory(Integer medhist_id, ArrayList<Symptom> symptoms) throws SQLException {
 		for(Symptom s : symptoms) {
 			try {
 				String sql = "INSERT INTO MedicalHistoryHasSymptoms (medhist_id, symptom_name) VALUES (?,?)";
