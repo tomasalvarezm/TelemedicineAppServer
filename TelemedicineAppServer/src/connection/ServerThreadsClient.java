@@ -19,6 +19,7 @@ import telemedicineApp.jdbc.JDBCMedicalHistoryManager;
 import telemedicineApp.jdbc.JDBCPatientManager;
 import telemedicineApp.jdbc.JDBCSymptomManager;
 import telemedicineApp.pojos.BitalinoSignal;
+import telemedicineApp.pojos.Doctor;
 import telemedicineApp.pojos.MedicalHistory;
 import telemedicineApp.pojos.Patient;
 
@@ -68,17 +69,15 @@ public class ServerThreadsClient implements Runnable {
 			
 			switch (getRole(objectInput)) {
 			
-			// patient
+			//PATIENT
 			case 0:
 				while(connection) {
 					switch (getFunction(objectInput)) {
 					
 					//register
 					case 0:
-						System.out.println("Antes de registrar");
 						objectOutput.writeBoolean(registerPatient(objectInput));
 						objectOutput.flush();
-						System.out.println("Despues de registrar");
 						break;
 					
 					//login
@@ -118,11 +117,40 @@ public class ServerThreadsClient implements Runnable {
 						break;
 					}
 				}
-				break;	
+				break;
 				
-			// doctor
+				
+			//DOCTOR
 			case 1:
-				
+				while(connection) {
+					switch (getFunction(objectInput)) {
+					
+					//register
+					case 0:
+						System.out.println("Antes de registrar");
+						objectOutput.writeBoolean(registerDoctor(objectInput));
+						objectOutput.flush();
+						System.out.println("Despues de registrar");
+						break;
+					
+					//login
+					case 1:
+						try {
+							objectOutput.writeObject(getDoctorFromID(objectInput));
+							objectOutput.flush();
+						} catch (SQLException e) {
+							objectOutput.writeObject(null);
+							objectOutput.flush();
+							break;
+						}
+						
+						boolean login = true;
+						while(login) {
+							
+						}
+						break;
+					}
+				}
 				break;
 			}
 			//releaseResources();
@@ -178,16 +206,6 @@ public class ServerThreadsClient implements Runnable {
 		} else
 			return 2;
 	}
-	
-	/*private int getDoctorFunction(ObjectInputStream objInput) throws ClassNotFoundException, IOException {
-		String function = (String) objInput.readObject();
-		if (function.equalsIgnoreCase("")) {
-			return 0;
-		} else if (function.equalsIgnoreCase("")) {
-			return 1;
-		} else
-			return 2;
-	}*/
 
 	// PATIENT FUNCTIONALITIES
 	private boolean registerPatient(ObjectInputStream objInput) throws ClassNotFoundException, IOException {
@@ -237,5 +255,21 @@ public class ServerThreadsClient implements Runnable {
 	}
 
 	// DOCTOR FUNCITONALITIES
+	private boolean registerDoctor(ObjectInputStream objInput) throws ClassNotFoundException, IOException {
+		Doctor doctor = (Doctor) objInput.readObject();
+		System.out.println(doctor);
+		try {
+			doctorManager.insertDoctor(doctor);
+		} catch(SQLException ex) {
+			return false;
+		}
+		return true; // method insertPatient(patient) should return true instead??
+	}
+	
+	private Doctor getDoctorFromID(ObjectInputStream objInput) throws ClassNotFoundException, IOException, SQLException {
+		String id = (String) objInput.readObject();
+		Doctor doctor = doctorManager.getDoctorById(id);
+		return doctor;
+	}
 
 }
