@@ -8,6 +8,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -85,7 +86,11 @@ public class ServerThreadsClient implements Runnable {
 					
 					//login
 					case 1:
-						objectOutput.writeObject(getPatientFromID(objectInput));
+						try {
+							objectOutput.writeObject(getPatientFromID(objectInput));
+						} catch (SQLException e) {
+							objectOutput.writeObject(null);
+						}
 						objectOutput.flush();
 						boolean login = true;
 						while(login) {
@@ -183,7 +188,7 @@ public class ServerThreadsClient implements Runnable {
 		return true; // method insertPatient(patient) should return true instead??
 	}
 
-	private Patient getPatientFromID(ObjectInputStream objInput) throws ClassNotFoundException, IOException {
+	private Patient getPatientFromID(ObjectInputStream objInput) throws ClassNotFoundException, IOException, SQLException {
 		String id = (String) objInput.readObject();
 		Patient patient = patientManager.getPatientById(id);
 		return patient;

@@ -28,11 +28,11 @@ public class JDBCPatientManager implements PatientManager{
 		this.bsm = bsm;
 	}
 
-	public Patient getPatientById(String patient_id) {
+	public Patient getPatientById(String patient_id) throws SQLException{
 		Patient patient = null;
 		Sex sexo=null;
 
-		try {
+		
 			String sql = "SELECT * FROM Patient WHERE id = ?";
 			PreparedStatement prep = manager.getConnection().prepareStatement(sql);
 			prep.setString(1, patient_id);
@@ -58,9 +58,7 @@ public class JDBCPatientManager implements PatientManager{
 						
 			rs.close();
 			prep.close();
-		} catch (SQLException ex) {
-			ex.printStackTrace();
-		}
+		
 		return patient;
 		
 	}

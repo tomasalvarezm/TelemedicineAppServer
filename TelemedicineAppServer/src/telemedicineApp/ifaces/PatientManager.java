@@ -1,12 +1,13 @@
 package telemedicineApp.ifaces;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import telemedicineApp.pojos.Patient;
 
 public interface PatientManager {
 	
-	public Patient getPatientById(String patient_id);
+	public Patient getPatientById(String patient_id) throws SQLException;
 	public void insertPatient(Patient p);
 
 
