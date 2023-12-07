@@ -1,10 +1,12 @@
 package telemedicineApp.jdbc;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
 
 import javax.swing.JCheckBox;
 
@@ -58,35 +60,9 @@ public class JDBCManager {
 			sql = "CREATE TABLE Symptom" + "(name TEXT UNIQUE, PRIMARY KEY(name))";
 			stm.executeUpdate(sql);
 			
-			sql = "CREATE TABLE MedicalHistory" + "(id INTEGER UNIQUE, medication TEXT, date_medhist DATE, patient_id TEXT REFERENCES Patient(id), PRIMARY KEY(id AUTOINCREMENT))";
-			stm.executeUpdate(sql);
-			
-			sql = "CREATE TABLE MedicalHistoryHasSymptoms" + "(medhist_id TEXT REFERENCES MedicalHistory(id),"
-					+ " symptom_name TEXT REFERENCES Symptom(name), PRIMARY KEY (medhist_id, symptom_name))";
-			stm.executeUpdate(sql);
-			
-			sql = "CREATE TABLE BitalinoSignal" + "(id INTEGER UNIQUE, patient_id TEXT REFERENCES Patient(id), signal_duration TEXT,"
-					+ " date_signal DATE, filePath TEXT, PRIMARY KEY(id AUTOINCREMENT))";
-			stm.executeUpdate(sql);
-			
-			//DEFAULT USERS TO DEMONSTRATE APP FUNCTIONALITY
-			sql = "INSERT INTO Doctor " + "(id, name, sex) VALUES (?,?,?)";
-			PreparedStatement prep = c.prepareStatement(sql);
-			prep.setString(1, "32356324T");
-			prep.setString(2, "María Guzmán");
-			prep.setString(3, "FEMALE");
-			prep.executeUpdate();
-			/*
-			sql = "INSERT INTO Patient " + "(id, name, email, dob, age, sex, phoneNumber, doctor_id) VALUES (?,?,?)";
-			PreparedStatement prep = c.prepareStatement(sql);
-			prep.setString(1, "32356324T");
-			prep.setString(2, "María Guzmán");
-			prep.setString(3, "FEMALE");
-			prep.executeUpdate();
-			*/
 			//Insert symptoms
 			sql = "INSERT INTO Symptom (name) VALUES (?)";
-			prep = c.prepareStatement(sql);
+			PreparedStatement prep = c.prepareStatement(sql);
 			prep.setString(1, "Drowsiness");
 			prep.executeUpdate();
 			
@@ -116,6 +92,64 @@ public class JDBCManager {
 			prep.executeUpdate();
 
 
+			sql = "CREATE TABLE MedicalHistory" + "(id INTEGER UNIQUE, medication TEXT, date_medhist DATE, patient_id TEXT REFERENCES Patient(id), PRIMARY KEY(id AUTOINCREMENT))";
+			stm.executeUpdate(sql);
+			
+			sql = "CREATE TABLE MedicalHistoryHasSymptoms" + "(medhist_id TEXT REFERENCES MedicalHistory(id),"
+					+ " symptom_name TEXT REFERENCES Symptom(name), PRIMARY KEY (medhist_id, symptom_name))";
+			stm.executeUpdate(sql);
+			
+			sql = "CREATE TABLE BitalinoSignal" + "(id INTEGER UNIQUE, patient_id TEXT REFERENCES Patient(id), signal_duration TEXT,"
+					+ " date_signal DATE, filePath TEXT, PRIMARY KEY(id AUTOINCREMENT))";
+			stm.executeUpdate(sql);
+			
+			//DEFAULT USERS TO DEMONSTRATE APP FUNCTIONALITY
+			sql = "INSERT INTO Doctor " + "(id, name, sex) VALUES (?,?,?)";
+			prep = c.prepareStatement(sql);
+			prep.setString(1, "32356324T");
+			prep.setString(2, "María Guzmán");
+			prep.setString(3, "FEMALE");
+			prep.executeUpdate();
+			
+			sql = "INSERT INTO Patient " + "(id, name, email, dob, age, sex, phoneNumber, doctor_id) VALUES (?,?,?,?,?,?,?,?)";
+			prep = c.prepareStatement(sql);
+			prep.setString(1, "01236793Z");
+			prep.setString(2, "Alejandro Pérez");
+			prep.setString(3, "alexperez@gmail.com");
+			prep.setDate(4, Date.valueOf(LocalDate.of(1997, 11, 14)));
+			prep.setInt(5,26);
+			prep.setString(6, "MALE");
+			prep.setInt(7, 678934506);
+			prep.setString(8,"32356324T");
+			prep.executeUpdate();
+			
+			sql = "INSERT INTO MedicalHistory " + "(medication, date_medhist,patient_id) VALUES (?,?,?)";
+			prep = c.prepareStatement(sql);
+			prep.setString(1, "LEVODOPA");
+			prep.setDate(2, Date.valueOf(LocalDate.of(2023, 10, 25)));
+			prep.setString(3, "01236793Z");
+			prep.executeUpdate();
+			
+			sql = "INSERT INTO MedicalHistoryHasSymptoms " + "(medhist_id,symptom_name) VALUES (?,?)";
+			prep = c.prepareStatement(sql);
+			prep.setInt(1, 1);
+			prep.setString(2, "Drowsiness");
+			prep.executeUpdate();
+			
+			sql = "INSERT INTO MedicalHistoryHasSymptoms " + "(medhist_id,symptom_name) VALUES (?,?)";
+			prep = c.prepareStatement(sql);
+			prep.setInt(1, 1);
+			prep.setString(2, "Nausea");
+			prep.executeUpdate();
+			
+			sql = "INSERT INTO BitalinoSignal " + "(patient_id, signal_duration, date_signal, filePath) VALUES (?,?,?,?)";
+			prep = c.prepareStatement(sql);
+			prep.setString(1, "01236793Z");
+			prep.setString(2, "13 minutos 23 segundos");
+			prep.setDate(3, Date.valueOf(LocalDate.of(2023, 11, 30)));
+			prep.setString(4,"C:\\Users\\User\\Documents\\ServerFiles\\01236793Z_2023-11-30");
+			prep.executeUpdate();
+			
 		} catch (SQLException e) {
 			// Do not complain if tables already exist
 			if (!e.getMessage().contains("already exists")) { 
