@@ -22,6 +22,7 @@ public class Server {
     			Socket socket = serverSocket.accept();
     			new Thread(new ServerThreadsClient(socket)).start();
 
+    			
     		}
     	} finally {
     		releaseResourcesServer(serverSocket);

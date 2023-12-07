@@ -2,6 +2,7 @@ package telemedicineApp.jdbc;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -67,8 +68,12 @@ public class JDBCManager {
 			stm.executeUpdate(sql);
 			
 			//FOR TESTING
-			sql = "INSERT INTO Doctor (id, name, sex) VALUES (1, Maca, FEMALE)";
-			stm.executeUpdate(sql);
+			sql = "INSERT INTO Doctor " + "(id, name, sex) VALUES (?,?,?)";
+			PreparedStatement prep = c.prepareStatement(sql);
+			prep.setString(1, "323563245T");
+			prep.setString(2, "Elena");
+			prep.setString(3, "FEMALE");
+			prep.executeUpdate();
 
 		} catch (SQLException e) {
 			// Do not complain if tables already exist

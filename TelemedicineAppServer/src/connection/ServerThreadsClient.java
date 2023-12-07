@@ -138,6 +138,7 @@ public class ServerThreadsClient implements Runnable {
 	// CLIENT ROLE
 	private int getRole(ObjectInputStream objInput) throws ClassNotFoundException, IOException {
 		String role = (String) objInput.readObject();
+		System.out.println(role);
 		if (role.equalsIgnoreCase("patient")) {
 			return 0;
 		} else
@@ -147,6 +148,7 @@ public class ServerThreadsClient implements Runnable {
 	// CLIENT ACTION
 	private int getFunction(ObjectInputStream objInput) throws ClassNotFoundException, IOException {
 		String function = (String) objInput.readObject();
+		System.out.println(function);
 		if (function.equalsIgnoreCase("register")) {
 			return 0;
 		} else

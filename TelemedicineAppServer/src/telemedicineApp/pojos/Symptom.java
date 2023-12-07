@@ -1,6 +1,8 @@
 package telemedicineApp.pojos;
 
-public class Symptom {
+import java.io.Serializable;
+
+public class Symptom implements Serializable {
 	private String name;	
 	
 	public Symptom() {

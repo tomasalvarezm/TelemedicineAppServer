@@ -1,10 +1,11 @@
 package telemedicineApp.pojos;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
 
-public class BitalinoSignal {
+public class BitalinoSignal implements Serializable {
 	private Integer id; //AUTOINCREMENT
 	private String patient_id; //TEXT
 	private String signal_duration; //TEXT

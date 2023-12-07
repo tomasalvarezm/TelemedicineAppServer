@@ -1,9 +1,10 @@
 package telemedicineApp.pojos;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
-public class MedicalHistory {
+public class MedicalHistory implements Serializable {
 	
 	private ArrayList<Symptom> symptoms;
 	private LocalDate date_medhist;
