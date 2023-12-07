@@ -3,7 +3,6 @@ package telemedicineApp.jdbc;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.sql.Date;
@@ -64,7 +63,7 @@ public class JDBCPatientManager implements PatientManager{
 	}
 	
 	public void insertPatient(Patient p) throws SQLException {
-		try {
+		
 			String sql = "INSERT INTO Patient (id, name, email, dob, age, sex, phoneNumber, doctor_id) VALUES (?,?,?,?,?,?,?,?)";
 			PreparedStatement prep = manager.getConnection().prepareStatement(sql);
 			prep.setString(1, p.getId());
@@ -77,9 +76,7 @@ public class JDBCPatientManager implements PatientManager{
 			prep.setString(8,p.getDoctor().getId());
 			prep.executeUpdate();
 
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
+		
 	}
 
 

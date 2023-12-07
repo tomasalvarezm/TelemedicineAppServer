@@ -23,7 +23,7 @@ public class JDBCBitalinoSignalManager implements BitalinoSignalManager {
 	public ArrayList<BitalinoSignal> getSignalsByPatientId(String patient_id) throws SQLException {
 		ArrayList<BitalinoSignal> signals = new ArrayList<BitalinoSignal>();
 
-		try {
+	
 			String sql = "SELECT * FROM BitalinoSignal WHERE patient_id = ?";
 			PreparedStatement prep = manager.getConnection().prepareStatement(sql);
 			prep.setString(1, patient_id);
@@ -39,14 +39,12 @@ public class JDBCBitalinoSignalManager implements BitalinoSignalManager {
 			rs.close();
 			prep.close();
 
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
+		
 		return signals;
 	}
 	
 	public void saveSignal (BitalinoSignal bs) throws SQLException{
-		try {
+	
 		String sql= "INSERT INTO BitalinoSignal (patient_id,signal_duration,date_signal,filePath) VALUES (?,?,?,?)";
 		PreparedStatement p= manager.getConnection().prepareStatement(sql);
 		p.setString(1, bs.getPatient_id());
@@ -56,14 +54,12 @@ public class JDBCBitalinoSignalManager implements BitalinoSignalManager {
 
 		p.executeUpdate();	
 		
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		
 	}
 	
 	public BitalinoSignal exportSignal (String id) throws SQLException {
 		BitalinoSignal bs= new BitalinoSignal();
-		try {
+		
 			String sql = "SELECT * FROM BitalinoSignal WHERE id = ?";
 			PreparedStatement prep = manager.getConnection().prepareStatement(sql);
 			prep.setString(1, id);
@@ -75,9 +71,7 @@ public class JDBCBitalinoSignalManager implements BitalinoSignalManager {
 
 			rs.close();
 			prep.close();
-		} catch(Exception ex) {
-			ex.printStackTrace();
-		}
+		
 		return bs;
 	}
 
