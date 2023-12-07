@@ -2,6 +2,7 @@ package connection;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -12,6 +13,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -269,8 +271,9 @@ public class ServerThreadsClient implements Runnable {
 		bitalinoSignal.setFilePath(pathname);
 		File file = new File(bitalinoSignal.getFilePath());
 		FileWriter fileWriter = new FileWriter(file);
-		for (Integer value : bitalinoSignal.getData()) {
+		for (int value : bitalinoSignal.getData()) {
 			fileWriter.write(value);
+			fileWriter.write("\n");
 		}
 		fileWriter.close();
 		try {
@@ -320,18 +323,16 @@ public class ServerThreadsClient implements Runnable {
 		String patientID = (String) objInput.readObject();
 		LocalDate date = (LocalDate) objInput.readObject();
 		BitalinoSignal bitalinoSignal = bitalinoSignalManager.getBitalinoSignal(patientID, date);
-		return bitalinoSignal;
-	}
-	
-	/*private String readBitalinoValues(String filepath) {
-		File file = new File(filepath);
+		
+		File file = new File(bitalinoSignal.getFilePath());
 		FileReader fileReader = new FileReader(file);
 		BufferedReader reader = new BufferedReader(fileReader);
-		String values = "";
 		String line;
 		while((line = reader.readLine()) != null) {
-			values += line + "\n"; //ver cual es el intro \ o /
+			bitalinoSignal.getData().add(Integer.parseInt(line));
 		}
-	}*/
+		reader.close();
+		return bitalinoSignal;
+	}
 
 }
