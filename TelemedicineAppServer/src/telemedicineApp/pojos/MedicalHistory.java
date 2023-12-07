@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 public class MedicalHistory implements Serializable {
 	
+	private static final long serialVersionUID = -3352887586557575571L;
 	private ArrayList<Symptom> symptoms;
 	private LocalDate date_medhist;
 	private Medication medication;

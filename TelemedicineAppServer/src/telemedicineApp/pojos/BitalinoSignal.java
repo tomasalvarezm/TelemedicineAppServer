@@ -5,7 +5,10 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 
 
-public class BitalinoSignal implements Serializable {
+public class BitalinoSignal implements Serializable{
+	
+	
+	private static final long serialVersionUID = -885475455192507709L;
 	private Integer id; //AUTOINCREMENT
 	private String patient_id; //TEXT
 	private String signal_duration; //TEXT
