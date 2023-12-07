@@ -1,6 +1,5 @@
 package connection;
 
-import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -9,7 +8,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -22,7 +20,6 @@ import telemedicineApp.jdbc.JDBCSymptomManager;
 import telemedicineApp.pojos.BitalinoSignal;
 import telemedicineApp.pojos.MedicalHistory;
 import telemedicineApp.pojos.Patient;
-import telemedicineApp.pojos.Symptom;
 
 public class ServerThreadsClient implements Runnable {
 
@@ -31,6 +28,8 @@ public class ServerThreadsClient implements Runnable {
 	private OutputStream outputStream;
 	private ObjectOutputStream objectOutput;
 	private ObjectInputStream objectInput;
+	
+	private boolean connection;
 
 	private JDBCManager dataBaseManager;
 	private JDBCPatientManager patientManager;
@@ -48,6 +47,7 @@ public class ServerThreadsClient implements Runnable {
 		this.doctorManager = new JDBCDoctorManager(dataBaseManager, medicalHistoryManager, bitalinoSignalManager);
 		this.patientManager = new JDBCPatientManager(dataBaseManager, doctorManager, medicalHistoryManager,
 				bitalinoSignalManager);
+		this.connection = true;
 	}
 
 	@Override
@@ -64,13 +64,13 @@ public class ServerThreadsClient implements Runnable {
 			outputStream = socket.getOutputStream();
 			objectInput = new ObjectInputStream(inputStream);
 			objectOutput = new ObjectOutputStream(outputStream);
-
+			
 			switch (getRole(objectInput)) {
-
+			
 			// patient
 			case 0:
-				while(true) {
-					switch(getFunction(objectInput)) {
+				while(connection) {
+					switch (getFunction(objectInput)) {
 					
 					//register
 					case 0:
@@ -97,18 +97,21 @@ public class ServerThreadsClient implements Runnable {
 							//logout
 							case 2:
 								login = false;
+								connection = false;
 								break;
 							}
 						}
 						break;
 					}
 				}
-				
+				break;	
 				
 			// doctor
 			case 1:
-
+				
+				break;
 			}
+			//releaseResources();
 
 		} catch (IOException | ClassNotFoundException ex) {
 			Logger.getLogger(ServerThreadsClient.class.getName()).log(Level.SEVERE, null, ex);
@@ -117,7 +120,7 @@ public class ServerThreadsClient implements Runnable {
 		}
 	}
 
-	//CLOSE CONNECTION
+	// CLOSE CONNECTION
 	private static void releaseResourcesClient(InputStream inputStream, Socket socket) {
 		try {
 			inputStream.close();
@@ -132,7 +135,7 @@ public class ServerThreadsClient implements Runnable {
 		}
 	}
 
-	//CLIENT ROLE 
+	// CLIENT ROLE
 	private int getRole(ObjectInputStream objInput) throws ClassNotFoundException, IOException {
 		String role = (String) objInput.readObject();
 		if (role.equalsIgnoreCase("patient")) {
@@ -141,27 +144,27 @@ public class ServerThreadsClient implements Runnable {
 			return 1;
 	}
 
-	//CLIENT ACTION
+	// CLIENT ACTION
 	private int getFunction(ObjectInputStream objInput) throws ClassNotFoundException, IOException {
 		String function = (String) objInput.readObject();
-		if(function.equalsIgnoreCase("register")) {
+		if (function.equalsIgnoreCase("register")) {
 			return 0;
-		} else 
+		} else
 			return 1;
-	}
-	
-	private int getPatientFunction(ObjectInputStream objInput) throws ClassNotFoundException, IOException {
-		String function = (String) objInput.readObject();
-		if(function.equalsIgnoreCase("modifysymptoms")) {
-			return 0;
-		} else if(function.equalsIgnoreCase("uploadsignal")) {
-			return 1;
-		} else 
-			return 2;
-			
 	}
 
-	//PATIENT FUNCTIONALITIES
+	private int getPatientFunction(ObjectInputStream objInput) throws ClassNotFoundException, IOException {
+		String function = (String) objInput.readObject();
+		if (function.equalsIgnoreCase("modifysymptoms")) {
+			return 0;
+		} else if (function.equalsIgnoreCase("uploadsignal")) {
+			return 1;
+		} else
+			return 2;
+
+	}
+
+	// PATIENT FUNCTIONALITIES
 	private boolean registerPatient(ObjectInputStream objInput) throws ClassNotFoundException, IOException {
 		Patient patient = (Patient) objInput.readObject();
 		patientManager.insertPatient(patient);
@@ -173,28 +176,28 @@ public class ServerThreadsClient implements Runnable {
 		Patient patient = patientManager.getPatientById(id);
 		return patient;
 	}
-	
+
 	private boolean saveBitalinoSignal(ObjectInputStream objInput) throws ClassNotFoundException, IOException {
 		BitalinoSignal bitalinoSignal = (BitalinoSignal) objInput.readObject();
-		String pathname = "/Users/elenamacarron/Desktop/TelemedicineProject/TelemedicineAppServer/" + bitalinoSignal.getPatient_id() + bitalinoSignal.getDateSignal();
+		String pathname = "/Users/elenamacarron/Desktop/TelemedicineProject/TelemedicineAppServer/"
+				+ bitalinoSignal.getPatient_id() + bitalinoSignal.getDateSignal();
 		bitalinoSignal.setFilePath(pathname);
-		File file = new File (bitalinoSignal.getFilePath());
+		File file = new File(bitalinoSignal.getFilePath());
 		FileWriter fileWriter = new FileWriter(file);
-		for(Integer value : bitalinoSignal.getData()) {
+		for (Integer value : bitalinoSignal.getData()) {
 			fileWriter.write(value);
 		}
-
+		fileWriter.close();
 		bitalinoSignalManager.saveSignal(bitalinoSignal);
-		
 		return true;
 	}
-	
+
 	private boolean uploadSymptoms(ObjectInputStream objInput) throws ClassNotFoundException, IOException {
 		MedicalHistory medicalHistory = (MedicalHistory) objectInput.readObject();
 		medicalHistoryManager.uploadMedicalHistory(medicalHistory);
 		return true;
 	}
-	
-	//DOCTOR FUNCITONALITIES
+
+	// DOCTOR FUNCITONALITIES
 
 }

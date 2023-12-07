@@ -66,6 +66,9 @@ public class JDBCManager {
 					+ " date_signal DATE, filePath TEXT, PRIMARY KEY(id AUTOINCREMENT))";
 			stm.executeUpdate(sql);
 			
+			//FOR TESTING
+			sql = "INSERT INTO Doctor (id, name, sex) VALUES (1, Maca, FEMALE)";
+			stm.executeUpdate(sql);
 
 		} catch (SQLException e) {
 			// Do not complain if tables already exist
