@@ -1,6 +1,8 @@
 package connection;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,6 +11,7 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -30,7 +33,7 @@ public class ServerThreadsClient implements Runnable {
 	private OutputStream outputStream;
 	private ObjectOutputStream objectOutput;
 	private ObjectInputStream objectInput;
-	
+
 	private boolean connection;
 
 	private JDBCManager dataBaseManager;
@@ -66,21 +69,21 @@ public class ServerThreadsClient implements Runnable {
 			outputStream = socket.getOutputStream();
 			objectInput = new ObjectInputStream(inputStream);
 			objectOutput = new ObjectOutputStream(outputStream);
-			
+
 			switch (getRole(objectInput)) {
-			
-			//PATIENT
+
+			// PATIENT
 			case 0:
-				while(connection) {
+				while (connection) {
 					switch (getFunction(objectInput)) {
-					
-					//register
+
+					// register
 					case 0:
 						objectOutput.writeBoolean(registerPatient(objectInput));
 						objectOutput.flush();
 						break;
-					
-					//login
+
+					// login
 					case 1:
 						try {
 							objectOutput.writeObject(getPatientFromID(objectInput));
@@ -90,24 +93,24 @@ public class ServerThreadsClient implements Runnable {
 							objectOutput.flush();
 							break;
 						}
-						
+
 						boolean login = true;
-						while(login) {
-							switch(getPatientFunction(objectInput)) {
-							
-							//new medical history
+						while (login) {
+							switch (getPatientFunction(objectInput)) {
+
+							// new medical history
 							case 0:
 								objectOutput.writeBoolean(uploadSymptoms(objectInput));
 								objectOutput.flush();
 								break;
-								
-							//new BITalino signal
+
+							// new BITalino signal
 							case 1:
 								objectOutput.writeBoolean(saveBitalinoSignal(objectInput));
 								objectOutput.flush();
 								break;
-								
-							//logout
+
+							// logout
 							case 2:
 								login = false;
 								connection = false;
@@ -118,22 +121,21 @@ public class ServerThreadsClient implements Runnable {
 					}
 				}
 				break;
-				
-				
-			//DOCTOR
+
+			// DOCTOR
 			case 1:
-				while(connection) {
+				while (connection) {
 					switch (getFunction(objectInput)) {
-					
-					//register
+
+					// register
 					case 0:
 						System.out.println("Antes de registrar");
 						objectOutput.writeBoolean(registerDoctor(objectInput));
 						objectOutput.flush();
 						System.out.println("Despues de registrar");
 						break;
-					
-					//login
+
+					// login
 					case 1:
 						try {
 							objectOutput.writeObject(getDoctorFromID(objectInput));
@@ -143,17 +145,41 @@ public class ServerThreadsClient implements Runnable {
 							objectOutput.flush();
 							break;
 						}
-						
+
 						boolean login = true;
-						while(login) {
-							
+						while (login) {
+							switch (getDoctorFunction(objectInput)) {
+
+							// see medical history
+							case 0:
+								try {
+									objectOutput.writeObject(getMedicalHistory(objectInput));
+									objectOutput.flush();
+								} catch (SQLException e) {
+									objectOutput.writeObject(null);
+									objectOutput.flush();
+								}
+								break;
+
+							// see BITalino signal
+							case 1:
+								objectOutput.writeBoolean(saveBitalinoSignal(objectInput));
+								objectOutput.flush();
+								break;
+
+							// logout
+							case 2:
+								login = false;
+								connection = false;
+								break;
+							}
 						}
 						break;
 					}
 				}
 				break;
 			}
-			//releaseResources();
+			// releaseResources();
 
 		} catch (IOException | ClassNotFoundException ex) {
 			Logger.getLogger(ServerThreadsClient.class.getName()).log(Level.SEVERE, null, ex);
@@ -206,6 +232,16 @@ public class ServerThreadsClient implements Runnable {
 		} else
 			return 2;
 	}
+	
+	private int getDoctorFunction(ObjectInputStream objInput) throws ClassNotFoundException, IOException {
+		String function = (String) objInput.readObject();
+		if (function.equalsIgnoreCase("medicalhistory")) {
+			return 0;
+		} else if (function.equalsIgnoreCase("signal")) {
+			return 1;
+		} else
+			return 2;
+	}
 
 	// PATIENT FUNCTIONALITIES
 	private boolean registerPatient(ObjectInputStream objInput) throws ClassNotFoundException, IOException {
@@ -213,13 +249,14 @@ public class ServerThreadsClient implements Runnable {
 		System.out.println(patient);
 		try {
 			patientManager.insertPatient(patient);
-		} catch(SQLException ex) {
+		} catch (SQLException ex) {
 			return false;
 		}
-		return true; // method insertPatient(patient) should return true instead??
+		return true; 
 	}
 
-	private Patient getPatientFromID(ObjectInputStream objInput) throws ClassNotFoundException, IOException, SQLException {
+	private Patient getPatientFromID(ObjectInputStream objInput)
+			throws ClassNotFoundException, IOException, SQLException {
 		String id = (String) objInput.readObject();
 		Patient patient = patientManager.getPatientById(id);
 		return patient;
@@ -227,8 +264,8 @@ public class ServerThreadsClient implements Runnable {
 
 	private boolean saveBitalinoSignal(ObjectInputStream objInput) throws ClassNotFoundException, IOException {
 		BitalinoSignal bitalinoSignal = (BitalinoSignal) objInput.readObject();
-		String pathname = "C:\\Users\\User\\Documents\\ServerFiles\\"
-				+ bitalinoSignal.getPatient_id() + bitalinoSignal.getDateSignal();
+		String pathname = "C:\\Users\\User\\Documents\\ServerFiles\\" + bitalinoSignal.getPatient_id()
+				+ bitalinoSignal.getDateSignal();
 		bitalinoSignal.setFilePath(pathname);
 		File file = new File(bitalinoSignal.getFilePath());
 		FileWriter fileWriter = new FileWriter(file);
@@ -238,7 +275,7 @@ public class ServerThreadsClient implements Runnable {
 		fileWriter.close();
 		try {
 			bitalinoSignalManager.saveSignal(bitalinoSignal);
-		} catch(SQLException ex) {
+		} catch (SQLException ex) {
 			return false;
 		}
 		return true;
@@ -248,7 +285,7 @@ public class ServerThreadsClient implements Runnable {
 		MedicalHistory medicalHistory = (MedicalHistory) objectInput.readObject();
 		try {
 			medicalHistoryManager.uploadMedicalHistory(medicalHistory);
-		} catch(SQLException ex) {
+		} catch (SQLException ex) {
 			return false;
 		}
 		return true;
@@ -260,16 +297,41 @@ public class ServerThreadsClient implements Runnable {
 		System.out.println(doctor);
 		try {
 			doctorManager.insertDoctor(doctor);
-		} catch(SQLException ex) {
+		} catch (SQLException ex) {
 			return false;
 		}
-		return true; // method insertPatient(patient) should return true instead??
+		return true;
 	}
-	
+
 	private Doctor getDoctorFromID(ObjectInputStream objInput) throws ClassNotFoundException, IOException, SQLException {
 		String id = (String) objInput.readObject();
 		Doctor doctor = doctorManager.getDoctorById(id);
 		return doctor;
 	}
+
+	private MedicalHistory getMedicalHistory(ObjectInputStream objInput) throws ClassNotFoundException, IOException, SQLException {
+		String patientID = (String) objInput.readObject();
+		LocalDate date = (LocalDate) objInput.readObject();
+		MedicalHistory medicalHistory = medicalHistoryManager.getMedicalHistory(patientID, date);
+		return medicalHistory;
+	}
+	
+	private BitalinoSignal getBitalinoSignal(ObjectInputStream objInput) throws ClassNotFoundException, IOException {
+		String patientID = (String) objInput.readObject();
+		LocalDate date = (LocalDate) objInput.readObject();
+		BitalinoSignal bitalinoSignal = bitalinoSignalManager.getBitalinoSignal(patientID, date);
+		return bitalinoSignal;
+	}
+	
+	/*private String readBitalinoValues(String filepath) {
+		File file = new File(filepath);
+		FileReader fileReader = new FileReader(file);
+		BufferedReader reader = new BufferedReader(fileReader);
+		String values = "";
+		String line;
+		while((line = reader.readLine()) != null) {
+			values += line + "\n"; //ver cual es el intro \ o /
+		}
+	}*/
 
 }

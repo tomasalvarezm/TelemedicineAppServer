@@ -86,7 +86,7 @@ public class JDBCMedicalHistoryManager implements MedicalHistoryManager {
 		return medHistID;
 	}
 	
-	public MedicalHistory getMedHistory (String patient_id, LocalDate medhist_date) throws SQLException{
+	public MedicalHistory getMedicalHistory (String patient_id, LocalDate medhist_date) throws SQLException{
 		MedicalHistory mh=null;
 		Medication medication=null;
 			String sql = "SELECT * FROM MedicalHistory WHERE patient_id = ? AND date_medhist = ?";
