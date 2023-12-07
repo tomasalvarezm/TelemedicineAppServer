@@ -20,6 +20,28 @@ public class JDBCBitalinoSignalManager implements BitalinoSignalManager {
 		this.manager = manager;
 	}
 
+	public ArrayList<BitalinoSignal> getSignalsByPatientIdAndDate(String patient_id, LocalDate dateSignal) throws SQLException {
+		ArrayList<BitalinoSignal> signals = new ArrayList<BitalinoSignal>();
+
+	
+			String sql = "SELECT * FROM BitalinoSignal WHERE patient_id = ? AND date_signal=?";
+			PreparedStatement prep = manager.getConnection().prepareStatement(sql);
+			prep.setString(1, patient_id);
+			prep.setDate(2,Date.valueOf(dateSignal));
+			ResultSet rs = prep.executeQuery();
+			while (rs.next()) {
+				Integer id = rs.getInt("id");
+				String signal_duration = rs.getString("signal_duration");
+				String filePath = rs.getString("filePath");
+				BitalinoSignal signal = new BitalinoSignal (id, patient_id, signal_duration,dateSignal, filePath);
+				signals.add(signal);
+			}
+			rs.close();
+			prep.close();
+
+		
+		return signals;
+	}
 	public ArrayList<BitalinoSignal> getSignalsByPatientId(String patient_id) throws SQLException {
 		ArrayList<BitalinoSignal> signals = new ArrayList<BitalinoSignal>();
 
@@ -31,9 +53,9 @@ public class JDBCBitalinoSignalManager implements BitalinoSignalManager {
 			while (rs.next()) {
 				Integer id = rs.getInt("id");
 				String signal_duration = rs.getString("signal_duration");
-				LocalDate date_signal = rs.getDate("date_signal").toLocalDate();
+				LocalDate dateSignal = rs.getDate("date_signal").toLocalDate();
 				String filePath = rs.getString("filePath");
-				BitalinoSignal signal = new BitalinoSignal (id, patient_id, signal_duration,date_signal, filePath);
+				BitalinoSignal signal = new BitalinoSignal (id, patient_id, signal_duration,dateSignal, filePath);
 				signals.add(signal);
 			}
 			rs.close();
@@ -42,7 +64,6 @@ public class JDBCBitalinoSignalManager implements BitalinoSignalManager {
 		
 		return signals;
 	}
-	
 	public void saveSignal (BitalinoSignal bs) throws SQLException{
 	
 		String sql= "INSERT INTO BitalinoSignal (patient_id,signal_duration,date_signal,filePath) VALUES (?,?,?,?)";
