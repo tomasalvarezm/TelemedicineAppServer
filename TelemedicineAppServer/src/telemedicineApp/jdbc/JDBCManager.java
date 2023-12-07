@@ -69,14 +69,21 @@ public class JDBCManager {
 					+ " date_signal DATE, filePath TEXT, PRIMARY KEY(id AUTOINCREMENT))";
 			stm.executeUpdate(sql);
 			
-			//FOR TESTING
+			//DEFAULT USERS TO DEMONSTRATE APP FUNCTIONALITY
 			sql = "INSERT INTO Doctor " + "(id, name, sex) VALUES (?,?,?)";
 			PreparedStatement prep = c.prepareStatement(sql);
-			prep.setString(1, "323563245T");
-			prep.setString(2, "Elena");
+			prep.setString(1, "32356324T");
+			prep.setString(2, "María Guzmán");
 			prep.setString(3, "FEMALE");
 			prep.executeUpdate();
-			
+			/*
+			sql = "INSERT INTO Patient " + "(id, name, email, dob, age, sex, phoneNumber, doctor_id) VALUES (?,?,?)";
+			PreparedStatement prep = c.prepareStatement(sql);
+			prep.setString(1, "32356324T");
+			prep.setString(2, "María Guzmán");
+			prep.setString(3, "FEMALE");
+			prep.executeUpdate();
+			*/
 			//Insert symptoms
 			sql = "INSERT INTO Symptom (name) VALUES (?)";
 			prep = c.prepareStatement(sql);
