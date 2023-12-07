@@ -2,8 +2,6 @@ package telemedicineApp.ifaces;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-
-import telemedicineApp.pojos.MedicalHistory;
 import telemedicineApp.pojos.Symptom;
 
 public interface SymptomManager {

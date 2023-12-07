@@ -1,7 +1,6 @@
 package telemedicineApp.ifaces;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 
 import telemedicineApp.pojos.Patient;
 

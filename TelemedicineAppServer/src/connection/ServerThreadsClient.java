@@ -319,7 +319,7 @@ public class ServerThreadsClient implements Runnable {
 		return medicalHistory;
 	}
 	
-	private BitalinoSignal getBitalinoSignal(ObjectInputStream objInput) throws ClassNotFoundException, IOException {
+	private BitalinoSignal getBitalinoSignal(ObjectInputStream objInput) throws ClassNotFoundException, IOException, SQLException {
 		String patientID = (String) objInput.readObject();
 		LocalDate date = (LocalDate) objInput.readObject();
 		BitalinoSignal bitalinoSignal = bitalinoSignalManager.getBitalinoSignal(patientID, date);
