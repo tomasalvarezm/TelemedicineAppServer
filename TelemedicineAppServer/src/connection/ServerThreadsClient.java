@@ -1,6 +1,7 @@
 package connection;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -9,6 +10,7 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.net.Socket;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -26,6 +28,7 @@ import telemedicineApp.pojos.BitalinoSignal;
 import telemedicineApp.pojos.Doctor;
 import telemedicineApp.pojos.MedicalHistory;
 import telemedicineApp.pojos.Patient;
+import telemedicineApp.pojos.Sex;
 
 public class ServerThreadsClient implements Runnable {
 
@@ -80,6 +83,23 @@ public class ServerThreadsClient implements Runnable {
 
 					// register
 					case 0:
+						System.out.println("Soy server voy a registrar");
+						try {
+							objectOutput.writeObject(doctorManager.getAllDoctors());
+							objectOutput.flush();
+							System.out.println("Soy server mande los doctores");
+						} catch (SQLException e1) {
+							objectOutput.writeObject(null);
+							objectOutput.flush();
+						}
+						System.out.println("Soy server esperando paciente para registrar");
+						try {
+							objectOutput.writeObject(getDoctorByName(objectInput));
+							objectOutput.flush();
+						} catch (SQLException e1) {
+							objectOutput.writeObject(null);
+							objectOutput.flush();
+						}
 						objectOutput.writeBoolean(registerPatient(objectInput));
 						objectOutput.flush();
 						break;
@@ -130,10 +150,8 @@ public class ServerThreadsClient implements Runnable {
 
 					// register
 					case 0:
-						System.out.println("Antes de registrar");
 						objectOutput.writeBoolean(registerDoctor(objectInput));
 						objectOutput.flush();
-						System.out.println("Despues de registrar");
 						break;
 
 					// login
@@ -251,7 +269,7 @@ public class ServerThreadsClient implements Runnable {
 		try {
 			inputStream.close();
 			objectInput.close();
-			
+
 			outputStream.close();
 			objectOutput.close();
 		} catch (IOException ex) {
@@ -264,7 +282,7 @@ public class ServerThreadsClient implements Runnable {
 			Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
 		}
 	}
-	
+
 	private void releaseResourcesDataBase(JDBCManager dataBaseManager) {
 		dataBaseManager.disconnect();
 	}
@@ -309,6 +327,15 @@ public class ServerThreadsClient implements Runnable {
 			return 2;
 	}
 
+	private boolean goesBack(ObjectInputStream objInput) throws ClassNotFoundException, IOException {
+		String back = (String) objInput.readObject();
+		if (back.equalsIgnoreCase("back")) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 	// PATIENT FUNCTIONALITIES
 	private boolean registerPatient(ObjectInputStream objInput) throws ClassNotFoundException, IOException {
 		Patient patient = (Patient) objInput.readObject();
@@ -327,19 +354,27 @@ public class ServerThreadsClient implements Runnable {
 		Patient patient = patientManager.getPatientById(id);
 		return patient;
 	}
+	
+	private Doctor getDoctorByName(ObjectInputStream objInput) throws ClassNotFoundException, IOException, SQLException {
+		String name = (String) objInput.readObject();
+		Doctor doctor = doctorManager.getDoctorByName(name);
+		return doctor;
+	}
 
 	private boolean saveBitalinoSignal(ObjectInputStream objInput) throws ClassNotFoundException, IOException {
 		BitalinoSignal bitalinoSignal = (BitalinoSignal) objInput.readObject();
-		String pathname = "C:\\Users\\User\\Documents\\ServerFiles\\" + bitalinoSignal.getPatient_id()
-				+ bitalinoSignal.getDateSignal();
+		String pathname = "files\\" + bitalinoSignal.getPatient_id() + "_" + bitalinoSignal.getDateSignal() + ".txt";
 		bitalinoSignal.setFilePath(pathname);
 		File file = new File(bitalinoSignal.getFilePath());
-		FileWriter fileWriter = new FileWriter(file);
-		for (int value : bitalinoSignal.getData()) {
-			fileWriter.write(value);
-			fileWriter.write("\n");
+		PrintWriter printWriter = new PrintWriter(file);
+		BufferedWriter bw = new BufferedWriter(printWriter);
+		for (Integer value : bitalinoSignal.getData()) {
+			System.out.println(value);
+			bw.write(value.toString());
+			bw.write("\n");
 		}
-		fileWriter.close();
+		bw.close();
+		printWriter.close();
 		try {
 			bitalinoSignalManager.saveSignal(bitalinoSignal);
 		} catch (SQLException ex) {
@@ -370,7 +405,8 @@ public class ServerThreadsClient implements Runnable {
 		return true;
 	}
 
-	private Doctor getDoctorFromID(ObjectInputStream objInput) throws ClassNotFoundException, IOException, SQLException {
+	private Doctor getDoctorFromID(ObjectInputStream objInput)
+			throws ClassNotFoundException, IOException, SQLException {
 		String id = (String) objInput.readObject();
 		Doctor doctor = doctorManager.getDoctorById(id);
 		return doctor;
@@ -407,14 +443,16 @@ public class ServerThreadsClient implements Runnable {
 			return false;
 	}
 
-	private MedicalHistory getMedicalHistory(ObjectInputStream objInput) throws ClassNotFoundException, IOException, SQLException {
+	private MedicalHistory getMedicalHistory(ObjectInputStream objInput)
+			throws ClassNotFoundException, IOException, SQLException {
 		String patientID = (String) objInput.readObject();
 		LocalDate date = (LocalDate) objInput.readObject();
 		MedicalHistory medicalHistory = medicalHistoryManager.getMedicalHistory(patientID, date);
 		return medicalHistory;
 	}
 
-	private BitalinoSignal getBitalinoSignal(ObjectInputStream objInput) throws ClassNotFoundException, IOException, SQLException {
+	private BitalinoSignal getBitalinoSignal(ObjectInputStream objInput)
+			throws ClassNotFoundException, IOException, SQLException {
 		String patientID = (String) objInput.readObject();
 		LocalDate date = (LocalDate) objInput.readObject();
 		BitalinoSignal bitalinoSignal = bitalinoSignalManager.getBitalinoSignal(patientID, date);

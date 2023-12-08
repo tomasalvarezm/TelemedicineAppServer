@@ -73,6 +73,21 @@ public class BitalinoSignal implements Serializable{
 	}
 
 
+	@Override
+	public String toString() {
+		return "BITALINO SIGNAL\n" + "Patient ID : " + patient_id + "\nDate : " + dateSignal + "\nSignal duration : "
+				+ signal_duration + dataToString();
+	}
+	
+	private String dataToString() {
+		String data = "";
+		for(int i = 0; i < this.data.size(); i++) {
+			data += "\nseq = " + i+1 + "\tvalue = " + this.data.get(i);
+		}
+		return data;
+	}
+
+	
 	
 	
 }

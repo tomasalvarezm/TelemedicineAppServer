@@ -58,6 +58,19 @@ public class MedicalHistory implements Serializable {
 	public void setDate_medhist(LocalDate date_medhist) {
 		this.date_medhist = date_medhist;
 	}
+
+	@Override
+	public String toString() {
+		return "MEDICAL HISTORY\n" + "Patient ID = " + patient_id + "\nDate = " + date_medhist + "\nMedication = " + medication + symptomsToString();
+	}
+	
+	private String symptomsToString() {
+		String symptoms = "\nSymptoms :";
+		for(int i = 0; i < this.symptoms.size(); i++) {
+			symptoms += "\n" + this.symptoms.get(i).getName();
+		}
+		return symptoms;
+	}
 	
 	
 
