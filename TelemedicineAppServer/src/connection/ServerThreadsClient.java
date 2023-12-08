@@ -146,7 +146,7 @@ public class ServerThreadsClient implements Runnable {
 							objectOutput.flush();
 							break;
 						}
-						
+
 						// patients shown in table
 						try {
 							objectOutput.writeObject(getPatients(objectInput));
@@ -155,15 +155,15 @@ public class ServerThreadsClient implements Runnable {
 							objectOutput.writeObject(null);
 							objectOutput.flush();
 						}
-						
+
 						boolean login = true;
 						while (login) {
-							
+
 							switch (getDoctorFunction(objectInput)) {
 
 							// see medical history
 							case 0:
-							
+
 								// patient chosen
 								try {
 									objectOutput.writeObject(getPatientFromID(objectInput));
@@ -172,7 +172,7 @@ public class ServerThreadsClient implements Runnable {
 									objectOutput.writeObject(null);
 									objectOutput.flush();
 								}
-								
+
 								// all medical history of selected patient
 								try {
 									objectOutput.writeObject(getAllMedicalHistory(objectInput));
@@ -181,7 +181,7 @@ public class ServerThreadsClient implements Runnable {
 									objectOutput.writeObject(null);
 									objectOutput.flush();
 								}
-								while(isSamePatient(objectInput)) {
+								while (isSamePatient(objectInput)) {
 									try {
 										objectOutput.writeObject(getMedicalHistory(objectInput));
 										objectOutput.flush();
@@ -194,7 +194,7 @@ public class ServerThreadsClient implements Runnable {
 
 							// see BITalino signal
 							case 1:
-								
+
 								// patient chosen
 								try {
 									objectOutput.writeObject(getPatientFromID(objectInput));
@@ -203,7 +203,7 @@ public class ServerThreadsClient implements Runnable {
 									objectOutput.writeObject(null);
 									objectOutput.flush();
 								}
-								
+
 								// all BITalino signals of selected patient
 								try {
 									objectOutput.writeObject(getBitalinoSignals(objectInput));
@@ -212,7 +212,7 @@ public class ServerThreadsClient implements Runnable {
 									objectOutput.writeObject(null);
 									objectOutput.flush();
 								}
-								while(isSamePatient(objectInput)) {
+								while (isSamePatient(objectInput)) {
 									try {
 										objectOutput.writeObject(getBitalinoSignal(objectInput));
 										objectOutput.flush();
@@ -235,19 +235,23 @@ public class ServerThreadsClient implements Runnable {
 				}
 				break;
 			}
-			// releaseResources();
 
 		} catch (IOException | ClassNotFoundException ex) {
 			Logger.getLogger(ServerThreadsClient.class.getName()).log(Level.SEVERE, null, ex);
 		} finally {
-			releaseResourcesClient(inputStream, socket);
+			releaseResourcesClient(inputStream, objectInput, outputStream, objectOutput, socket);
 		}
 	}
 
 	// CLOSE CONNECTION
-	private static void releaseResourcesClient(InputStream inputStream, Socket socket) {
+	private static void releaseResourcesClient(InputStream inputStream, ObjectInputStream objectInput,
+			OutputStream outputStream, ObjectOutputStream objectOutput, Socket socket) {
 		try {
 			inputStream.close();
+			objectInput.close();
+			
+			outputStream.close();
+			objectOutput.close();
 		} catch (IOException ex) {
 			Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
 		}
@@ -288,7 +292,7 @@ public class ServerThreadsClient implements Runnable {
 		} else
 			return 2;
 	}
-	
+
 	private int getDoctorFunction(ObjectInputStream objInput) throws ClassNotFoundException, IOException {
 		String function = (String) objInput.readObject();
 		if (function.equalsIgnoreCase("medicalhistory")) {
@@ -308,10 +312,11 @@ public class ServerThreadsClient implements Runnable {
 		} catch (SQLException ex) {
 			return false;
 		}
-		return true; 
+		return true;
 	}
 
-	private Patient getPatientFromID(ObjectInputStream objInput) throws ClassNotFoundException, IOException, SQLException {
+	private Patient getPatientFromID(ObjectInputStream objInput)
+			throws ClassNotFoundException, IOException, SQLException {
 		String id = (String) objInput.readObject();
 		Patient patient = patientManager.getPatientById(id);
 		return patient;
@@ -359,30 +364,34 @@ public class ServerThreadsClient implements Runnable {
 		return true;
 	}
 
-	private Doctor getDoctorFromID(ObjectInputStream objInput) throws ClassNotFoundException, IOException, SQLException {
+	private Doctor getDoctorFromID(ObjectInputStream objInput)
+			throws ClassNotFoundException, IOException, SQLException {
 		String id = (String) objInput.readObject();
 		Doctor doctor = doctorManager.getDoctorById(id);
 		return doctor;
 	}
-	
-	private ArrayList<Patient> getPatients(ObjectInputStream objInput) throws ClassNotFoundException, IOException, SQLException{
+
+	private ArrayList<Patient> getPatients(ObjectInputStream objInput)
+			throws ClassNotFoundException, IOException, SQLException {
 		String doctorID = (String) objInput.readObject();
 		ArrayList<Patient> patients = doctorManager.listPatientsByDoctorId(doctorID);
 		return patients;
 	}
-	
-	private ArrayList<MedicalHistory> getAllMedicalHistory(ObjectInputStream objInput) throws ClassNotFoundException, IOException, SQLException{
+
+	private ArrayList<MedicalHistory> getAllMedicalHistory(ObjectInputStream objInput)
+			throws ClassNotFoundException, IOException, SQLException {
 		String patientID = (String) objInput.readObject();
 		ArrayList<MedicalHistory> allMedicalHistory = medicalHistoryManager.getAllMedicalHistoryByPatientId(patientID);
 		return allMedicalHistory;
 	}
-	
-	private ArrayList<BitalinoSignal> getBitalinoSignals(ObjectInputStream objInput) throws ClassNotFoundException, IOException, SQLException{
+
+	private ArrayList<BitalinoSignal> getBitalinoSignals(ObjectInputStream objInput)
+			throws ClassNotFoundException, IOException, SQLException {
 		String patientID = (String) objInput.readObject();
 		ArrayList<BitalinoSignal> bitalinoSignals = bitalinoSignalManager.getSignalsByPatientId(patientID);
 		return bitalinoSignals;
-	} 
-	
+	}
+
 	private boolean isSamePatient(ObjectInputStream objInput) throws ClassNotFoundException, IOException {
 		String function = (String) objInput.readObject();
 		if (function.equalsIgnoreCase("samepatient")) {
@@ -391,23 +400,25 @@ public class ServerThreadsClient implements Runnable {
 			return false;
 	}
 
-	private MedicalHistory getMedicalHistory(ObjectInputStream objInput) throws ClassNotFoundException, IOException, SQLException {
+	private MedicalHistory getMedicalHistory(ObjectInputStream objInput)
+			throws ClassNotFoundException, IOException, SQLException {
 		String patientID = (String) objInput.readObject();
 		LocalDate date = (LocalDate) objInput.readObject();
 		MedicalHistory medicalHistory = medicalHistoryManager.getMedicalHistory(patientID, date);
 		return medicalHistory;
 	}
-	
-	private BitalinoSignal getBitalinoSignal(ObjectInputStream objInput) throws ClassNotFoundException, IOException, SQLException {
+
+	private BitalinoSignal getBitalinoSignal(ObjectInputStream objInput)
+			throws ClassNotFoundException, IOException, SQLException {
 		String patientID = (String) objInput.readObject();
 		LocalDate date = (LocalDate) objInput.readObject();
 		BitalinoSignal bitalinoSignal = bitalinoSignalManager.getBitalinoSignal(patientID, date);
-		
+
 		File file = new File(bitalinoSignal.getFilePath());
 		FileReader fileReader = new FileReader(file);
 		BufferedReader reader = new BufferedReader(fileReader);
 		String line;
-		while((line = reader.readLine()) != null) {
+		while ((line = reader.readLine()) != null) {
 			bitalinoSignal.getData().add(Integer.parseInt(line));
 		}
 		reader.close();
