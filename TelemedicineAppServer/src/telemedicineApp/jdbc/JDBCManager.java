@@ -146,7 +146,7 @@ public class JDBCManager {
 			prep.setString(1, "01236793Z");
 			prep.setString(2, "13 minutos 23 segundos");
 			prep.setDate(3, Date.valueOf(LocalDate.of(2023, 11, 30)));
-			prep.setString(4,"C:\\Users\\User\\Documents\\ServerFiles\\01236793Z_2023-11-30");
+			prep.setString(4,"files\\01236793Z_2023-11-30.txt");
 			prep.executeUpdate();
 			
 		} catch (SQLException e) {

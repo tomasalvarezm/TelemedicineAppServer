@@ -23,7 +23,7 @@ public class BitalinoSignal implements Serializable{
 		this.signal_duration = signal_duration;
 		this.dateSignal = date;
 		this.filePath = filePath;
-		
+		this.data = new ArrayList<Integer>();
 	}
 	
 	

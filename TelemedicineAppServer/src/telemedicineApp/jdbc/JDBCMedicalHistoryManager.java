@@ -28,9 +28,8 @@ public class JDBCMedicalHistoryManager implements MedicalHistoryManager {
 	}
 
 	public ArrayList<MedicalHistory> getAllMedicalHistoryByPatientId (String patient_id) throws SQLException{
-		ArrayList<MedicalHistory> medhists	= new ArrayList <MedicalHistory>();
+		ArrayList<MedicalHistory> medhists	= new ArrayList<MedicalHistory>();
 		Medication medication=null;
-		
 		
 		String sql = "SELECT * FROM MedicalHistory WHERE patient_id = ?";
 		PreparedStatement prep = manager.getConnection().prepareStatement(sql);

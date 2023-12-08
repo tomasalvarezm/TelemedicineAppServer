@@ -49,8 +49,8 @@ public class JDBCDoctorManager implements DoctorManager{
 			else {
 				sexo=Sex.FEMALE;
 			}
-			ArrayList <Patient> patientsList = listPatientsByDoctorId(doctor_id);
-			doc= new Doctor(doctor_id,name,sexo,patientsList);	
+			//ArrayList <Patient> patientsList = listPatientsByDoctorId(doctor_id);
+			doc= new Doctor(doctor_id,name,sexo/*,patientsList*/);	
 			
 			rs.close();
 			prep.close();
@@ -60,15 +60,13 @@ public class JDBCDoctorManager implements DoctorManager{
 
 	public ArrayList<Patient> listPatientsByDoctorId(String doctor_id) throws SQLException {
 		ArrayList<Patient> patients = new ArrayList<Patient>();
-		Medication med=null;
 		Sex sexo=null;
-		Patient p=null;
 	
-			Statement stat = manager.getConnection().createStatement();
-			String sql = "SELECT * FROM Patient WHERE doctor_id= ?";
+			//Statement stat = manager.getConnection().createStatement();
+			String sql = "SELECT * FROM Patient WHERE doctor_id = ?";
 			PreparedStatement prep = manager.getConnection().prepareStatement(sql);
 			prep.setString(1, doctor_id);
-			ResultSet rs = stat.executeQuery(sql);
+			ResultSet rs = prep.executeQuery();
 			while (rs.next()) {
 				String patient_id = rs.getString("id");
 				String name = rs.getString("name");
@@ -81,23 +79,18 @@ public class JDBCDoctorManager implements DoctorManager{
 				}else {
 					sexo=Sex.FEMALE;
 				}
-				String meds=rs.getString("medication");
-				if (meds=="LEVODOPA") {
-					 med=Medication.LEVODOPA;
-				}else {
-					med=Medication.PRAMIPEXOL;
-				}
-				Integer phoneNumber = rs.getInt("phoneNumber");				
-				ArrayList<MedicalHistory> medhists = mhm.getAllMedicalHistoryByPatientId(patient_id);
-				ArrayList<BitalinoSignal> signals = bsm.getSignalsByPatientId(patient_id);
-				Doctor doctor= getDoctorById(doctor_id);
+				Integer phoneNumber = rs.getInt("phoneNumber");
 				
-				p = new Patient(patient_id,name, email, dob, age, sexo, phoneNumber, medhists, signals, doctor);
+				//ArrayList<MedicalHistory> medhists = mhm.getAllMedicalHistoryByPatientId(patient_id);
+				//ArrayList<BitalinoSignal> signals = bsm.getSignalsByPatientId(patient_id);
+				//Doctor doctor= getDoctorById(doctor_id);
+				
+				Patient p = new Patient(patient_id,name, email, dob, age, sexo, phoneNumber/*, medhists, signals, doctor*/);
 							
 				patients.add(p);
 			}
 			rs.close();
-			stat.close();
+			prep.close();
 		
 		return patients;
 	}

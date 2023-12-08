@@ -41,6 +41,19 @@ public class Patient implements Serializable{
 		this.allsignals = allsignals;
 		this.doctor = doctor;
 	}
+	
+	public Patient(String id, String name, String email, LocalDate dob, Integer age, Sex sex, Integer phoneNumber) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.email = email;
+		this.dob = dob;
+		this.age = age;
+		this.sex = sex;
+		this.phoneNumber = phoneNumber;
+		this.medhists = new ArrayList<MedicalHistory>();
+		this.allsignals = new ArrayList<BitalinoSignal>();
+	}
 
 
 	public String getId() {

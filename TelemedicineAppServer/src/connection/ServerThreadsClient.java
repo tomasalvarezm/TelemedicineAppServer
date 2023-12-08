@@ -152,6 +152,7 @@ public class ServerThreadsClient implements Runnable {
 							objectOutput.writeObject(getPatients(objectInput));
 							objectOutput.flush();
 						} catch (SQLException e1) {
+							e1.printStackTrace();
 							objectOutput.writeObject(null);
 							objectOutput.flush();
 						}
@@ -240,6 +241,7 @@ public class ServerThreadsClient implements Runnable {
 			Logger.getLogger(ServerThreadsClient.class.getName()).log(Level.SEVERE, null, ex);
 		} finally {
 			releaseResourcesClient(inputStream, objectInput, outputStream, objectOutput, socket);
+			releaseResourcesDataBase(dataBaseManager);
 		}
 	}
 
@@ -261,6 +263,10 @@ public class ServerThreadsClient implements Runnable {
 		} catch (IOException ex) {
 			Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
 		}
+	}
+	
+	private void releaseResourcesDataBase(JDBCManager dataBaseManager) {
+		dataBaseManager.disconnect();
 	}
 
 	// CLIENT ROLE
@@ -364,8 +370,7 @@ public class ServerThreadsClient implements Runnable {
 		return true;
 	}
 
-	private Doctor getDoctorFromID(ObjectInputStream objInput)
-			throws ClassNotFoundException, IOException, SQLException {
+	private Doctor getDoctorFromID(ObjectInputStream objInput) throws ClassNotFoundException, IOException, SQLException {
 		String id = (String) objInput.readObject();
 		Doctor doctor = doctorManager.getDoctorById(id);
 		return doctor;
@@ -375,6 +380,8 @@ public class ServerThreadsClient implements Runnable {
 			throws ClassNotFoundException, IOException, SQLException {
 		String doctorID = (String) objInput.readObject();
 		ArrayList<Patient> patients = doctorManager.listPatientsByDoctorId(doctorID);
+		System.out.println("Soy server");
+		System.out.println(patients);
 		return patients;
 	}
 
@@ -400,16 +407,14 @@ public class ServerThreadsClient implements Runnable {
 			return false;
 	}
 
-	private MedicalHistory getMedicalHistory(ObjectInputStream objInput)
-			throws ClassNotFoundException, IOException, SQLException {
+	private MedicalHistory getMedicalHistory(ObjectInputStream objInput) throws ClassNotFoundException, IOException, SQLException {
 		String patientID = (String) objInput.readObject();
 		LocalDate date = (LocalDate) objInput.readObject();
 		MedicalHistory medicalHistory = medicalHistoryManager.getMedicalHistory(patientID, date);
 		return medicalHistory;
 	}
 
-	private BitalinoSignal getBitalinoSignal(ObjectInputStream objInput)
-			throws ClassNotFoundException, IOException, SQLException {
+	private BitalinoSignal getBitalinoSignal(ObjectInputStream objInput) throws ClassNotFoundException, IOException, SQLException {
 		String patientID = (String) objInput.readObject();
 		LocalDate date = (LocalDate) objInput.readObject();
 		BitalinoSignal bitalinoSignal = bitalinoSignalManager.getBitalinoSignal(patientID, date);

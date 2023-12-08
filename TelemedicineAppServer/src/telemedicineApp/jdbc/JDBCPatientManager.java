@@ -52,7 +52,7 @@ public class JDBCPatientManager implements PatientManager{
 			ArrayList<BitalinoSignal> signals = bsm.getSignalsByPatientId(patient_id);
 			String doctor_id=rs.getString("doctor_id");
 			Doctor doctor= dm.getDoctorById(doctor_id);
-			//LocalDate d = LocalDate.of(dob.getYear(), dob.getMonth(), dob.getDay());
+			
 			patient = new Patient(patient_id,name, email, dob, age, sexo, phoneNumber, medhists, signals, doctor);
 						
 			rs.close();

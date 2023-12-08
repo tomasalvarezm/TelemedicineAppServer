@@ -24,6 +24,14 @@ public class Doctor implements Serializable{
 		this.sex = sex;
 		this.patientsList = patientsList;
 	}
+	
+	public Doctor(String id, String name, Sex sex) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.sex = sex;
+		this.patientsList = new ArrayList<Patient>();
+	}
 
 
 	public String getId() {
