@@ -48,7 +48,7 @@ public class JDBCPatientManager implements PatientManager{
 				sexo=Sex.FEMALE;
 			}
 			Integer phoneNumber = rs.getInt("phoneNumber");
-			ArrayList<MedicalHistory> medhists = mhm.getMedHistoriesByPatientId(patient_id);
+			ArrayList<MedicalHistory> medhists = mhm.getAllMedicalHistoryByPatientId(patient_id);
 			ArrayList<BitalinoSignal> signals = bsm.getSignalsByPatientId(patient_id);
 			String doctor_id=rs.getString("doctor_id");
 			Doctor doctor= dm.getDoctorById(doctor_id);

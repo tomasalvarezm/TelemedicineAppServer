@@ -27,7 +27,7 @@ public class JDBCMedicalHistoryManager implements MedicalHistoryManager {
 		this.sm = sm;
 	}
 
-	public ArrayList<MedicalHistory> getMedHistoriesByPatientId (String patient_id) throws SQLException{
+	public ArrayList<MedicalHistory> getAllMedicalHistoryByPatientId (String patient_id) throws SQLException{
 		ArrayList<MedicalHistory> medhists	= new ArrayList <MedicalHistory>();
 		Medication medication=null;
 		

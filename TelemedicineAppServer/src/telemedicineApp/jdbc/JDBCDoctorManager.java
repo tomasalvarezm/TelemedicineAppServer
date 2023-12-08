@@ -88,7 +88,7 @@ public class JDBCDoctorManager implements DoctorManager{
 					med=Medication.PRAMIPEXOL;
 				}
 				Integer phoneNumber = rs.getInt("phoneNumber");				
-				ArrayList<MedicalHistory> medhists = mhm.getMedHistoriesByPatientId(patient_id);
+				ArrayList<MedicalHistory> medhists = mhm.getAllMedicalHistoryByPatientId(patient_id);
 				ArrayList<BitalinoSignal> signals = bsm.getSignalsByPatientId(patient_id);
 				Doctor doctor= getDoctorById(doctor_id);
 				
