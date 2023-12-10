@@ -33,7 +33,7 @@ public class JDBCManager {
 	public void disconnect() {
 		try {
 			c.close();
-			System.out.println("Database connection closed.");
+			System.out.println("Database connection closed for this client.");
 		} catch (SQLException ex) {
 			ex.printStackTrace();
 		}
@@ -106,14 +106,21 @@ public class JDBCManager {
 			sql = "INSERT INTO Doctor " + "(id, name, sex) VALUES (?,?,?)";
 			prep = c.prepareStatement(sql);
 			prep.setString(1, "32356324T");
-			prep.setString(2, "María Guzmán");
+			prep.setString(2, "Maria Guzman");
 			prep.setString(3, "FEMALE");
+			prep.executeUpdate();
+			
+			sql = "INSERT INTO Doctor " + "(id, name, sex) VALUES (?,?,?)";
+			prep = c.prepareStatement(sql);
+			prep.setString(1, "32354875A");
+			prep.setString(2, "Fernando Saenz");
+			prep.setString(3, "MALE");
 			prep.executeUpdate();
 			
 			sql = "INSERT INTO Patient " + "(id, name, email, dob, age, sex, phoneNumber, doctor_id) VALUES (?,?,?,?,?,?,?,?)";
 			prep = c.prepareStatement(sql);
 			prep.setString(1, "01236793Z");
-			prep.setString(2, "Alejandro Pérez");
+			prep.setString(2, "Alejandro Perez");
 			prep.setString(3, "alexperez@gmail.com");
 			prep.setDate(4, Date.valueOf(LocalDate.of(1997, 11, 14)));
 			prep.setInt(5,26);
@@ -141,10 +148,29 @@ public class JDBCManager {
 			prep.setString(2, "Nausea");
 			prep.executeUpdate();
 			
+			sql = "INSERT INTO MedicalHistory " + "(medication, date_medhist,patient_id) VALUES (?,?,?)";
+			prep = c.prepareStatement(sql);
+			prep.setString(1, "LEVODOPA");
+			prep.setDate(2, Date.valueOf(LocalDate.of(2023, 11, 10)));
+			prep.setString(3, "01236793Z");
+			prep.executeUpdate();
+			
+			sql = "INSERT INTO MedicalHistoryHasSymptoms " + "(medhist_id,symptom_name) VALUES (?,?)";
+			prep = c.prepareStatement(sql);
+			prep.setInt(1, 2);
+			prep.setString(2, "Swelling");
+			prep.executeUpdate();
+			
+			sql = "INSERT INTO MedicalHistoryHasSymptoms " + "(medhist_id,symptom_name) VALUES (?,?)";
+			prep = c.prepareStatement(sql);
+			prep.setInt(1, 2);
+			prep.setString(2, "Nausea");
+			prep.executeUpdate();
+			
 			sql = "INSERT INTO BitalinoSignal " + "(patient_id, signal_duration, date_signal, filePath) VALUES (?,?,?,?)";
 			prep = c.prepareStatement(sql);
 			prep.setString(1, "01236793Z");
-			prep.setString(2, "13 minutos 23 segundos");
+			prep.setString(2, "5 minutes 23 seconds");
 			prep.setDate(3, Date.valueOf(LocalDate.of(2023, 11, 30)));
 			prep.setString(4,"files\\01236793Z_2023-11-30.txt");
 			prep.executeUpdate();

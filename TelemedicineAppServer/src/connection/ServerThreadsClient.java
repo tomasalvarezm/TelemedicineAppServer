@@ -319,7 +319,6 @@ public class ServerThreadsClient implements Runnable {
 	// CLIENT ROLE
 	private int getRole(ObjectInputStream objInput) throws ClassNotFoundException, IOException {
 		String role = (String) objInput.readObject();
-		System.out.println(role);
 		this.role = role;
 		if (role.equalsIgnoreCase("patient")) {
 			return 0;
@@ -330,7 +329,6 @@ public class ServerThreadsClient implements Runnable {
 	// CLIENT ACTION
 	private int getFunction(ObjectInputStream objInput) throws ClassNotFoundException, IOException {
 		String function = (String) objInput.readObject();
-		System.out.println(function);
 		if (function.equalsIgnoreCase("register")) {
 			return 0;
 		} else
@@ -369,7 +367,6 @@ public class ServerThreadsClient implements Runnable {
 	// PATIENT FUNCTIONALITIES
 	private boolean registerPatient(ObjectInputStream objInput) throws ClassNotFoundException, IOException {
 		Patient patient = (Patient) objInput.readObject();
-		System.out.println(patient);
 		try {
 			patientManager.insertPatient(patient);
 		} catch (SQLException ex) {
@@ -399,7 +396,6 @@ public class ServerThreadsClient implements Runnable {
 		PrintWriter printWriter = new PrintWriter(file);
 		BufferedWriter bw = new BufferedWriter(printWriter);
 		for (Integer value : bitalinoSignal.getData()) {
-			System.out.println(value);
 			bw.write(value.toString());
 			bw.write("\n");
 		}
@@ -426,7 +422,6 @@ public class ServerThreadsClient implements Runnable {
 	// DOCTOR FUNCITONALITIES
 	private boolean registerDoctor(ObjectInputStream objInput) throws ClassNotFoundException, IOException {
 		Doctor doctor = (Doctor) objInput.readObject();
-		System.out.println(doctor);
 		try {
 			doctorManager.insertDoctor(doctor);
 		} catch (SQLException ex) {
@@ -446,8 +441,6 @@ public class ServerThreadsClient implements Runnable {
 			throws ClassNotFoundException, IOException, SQLException {
 		String doctorID = (String) objInput.readObject();
 		ArrayList<Patient> patients = doctorManager.listPatientsByDoctorId(doctorID);
-		System.out.println("Soy server");
-		System.out.println(patients);
 		return patients;
 	}
 
