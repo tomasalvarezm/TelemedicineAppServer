@@ -43,7 +43,7 @@ public class Server extends JFrame{
 	private static ServerSocket serverSocket;
 	private static Server frame;
 	
-	private final String adminPassword = "123"; 
+	private final String adminPassword = "vamosaaprobar"; 
 	private static boolean acceptingConnections = true;
 	
     
