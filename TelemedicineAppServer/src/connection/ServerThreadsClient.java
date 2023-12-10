@@ -2,6 +2,7 @@ package connection;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -12,6 +13,7 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.net.SocketException;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -38,6 +40,7 @@ public class ServerThreadsClient implements Runnable {
 	private ObjectOutputStream objectOutput;
 	private ObjectInputStream objectInput;
 
+	private String role;
 	private boolean connection;
 
 	private JDBCManager dataBaseManager;
@@ -83,16 +86,22 @@ public class ServerThreadsClient implements Runnable {
 
 					// register
 					case 0:
-						System.out.println("Soy server voy a registrar");
+						
+						// doctors name shown in JComboBox
 						try {
 							objectOutput.writeObject(doctorManager.getAllDoctors());
 							objectOutput.flush();
-							System.out.println("Soy server mande los doctores");
 						} catch (SQLException e1) {
 							objectOutput.writeObject(null);
 							objectOutput.flush();
 						}
-						System.out.println("Soy server esperando paciente para registrar");
+						
+						// checks if the patient press back button
+						if(goesBack(objectInput)) {
+							break;
+						}
+						
+						// doctor chosen
 						try {
 							objectOutput.writeObject(getDoctorByName(objectInput));
 							objectOutput.flush();
@@ -100,12 +109,16 @@ public class ServerThreadsClient implements Runnable {
 							objectOutput.writeObject(null);
 							objectOutput.flush();
 						}
+						
+						// insert patient to database
 						objectOutput.writeBoolean(registerPatient(objectInput));
 						objectOutput.flush();
 						break;
 
 					// login
 					case 1:
+						
+						// checking the patient in the database
 						try {
 							objectOutput.writeObject(getPatientFromID(objectInput));
 							objectOutput.flush();
@@ -150,12 +163,21 @@ public class ServerThreadsClient implements Runnable {
 
 					// register
 					case 0:
+						
+						// checks if the doctor press back button
+						if(goesBack(objectInput)) {
+							break;
+						}
+						
+						// insert doctor into database
 						objectOutput.writeBoolean(registerDoctor(objectInput));
 						objectOutput.flush();
 						break;
 
 					// login
 					case 1:
+						
+						// checking the doctor in the database
 						try {
 							objectOutput.writeObject(getDoctorFromID(objectInput));
 							objectOutput.flush();
@@ -177,7 +199,6 @@ public class ServerThreadsClient implements Runnable {
 
 						boolean login = true;
 						while (login) {
-
 							switch (getDoctorFunction(objectInput)) {
 
 							// see medical history
@@ -201,6 +222,8 @@ public class ServerThreadsClient implements Runnable {
 									objectOutput.flush();
 								}
 								while (isSamePatient(objectInput)) {
+									
+									//sends the medical history
 									try {
 										objectOutput.writeObject(getMedicalHistory(objectInput));
 										objectOutput.flush();
@@ -232,6 +255,8 @@ public class ServerThreadsClient implements Runnable {
 									objectOutput.flush();
 								}
 								while (isSamePatient(objectInput)) {
+									
+									//sends the BITalino signal
 									try {
 										objectOutput.writeObject(getBitalinoSignal(objectInput));
 										objectOutput.flush();
@@ -255,11 +280,15 @@ public class ServerThreadsClient implements Runnable {
 				break;
 			}
 
-		} catch (IOException | ClassNotFoundException ex) {
+		} catch (SocketException | EOFException e) {
+			System.out.println("Client has closed connection");
+		} catch (IOException | ClassNotFoundException ex){
 			Logger.getLogger(ServerThreadsClient.class.getName()).log(Level.SEVERE, null, ex);
 		} finally {
+			Server.removeConnectedClient(this);
 			releaseResourcesClient(inputStream, objectInput, outputStream, objectOutput, socket);
 			releaseResourcesDataBase(dataBaseManager);
+			System.out.println("Server has closed this client streams");
 		}
 	}
 
@@ -291,6 +320,7 @@ public class ServerThreadsClient implements Runnable {
 	private int getRole(ObjectInputStream objInput) throws ClassNotFoundException, IOException {
 		String role = (String) objInput.readObject();
 		System.out.println(role);
+		this.role = role;
 		if (role.equalsIgnoreCase("patient")) {
 			return 0;
 		} else
@@ -468,4 +498,16 @@ public class ServerThreadsClient implements Runnable {
 		return bitalinoSignal;
 	}
 
+	
+	
+	// GETTERS
+	public Socket getSocket() {
+		return socket;
+	}
+
+	public String getRole() {
+		return role;
+	}
+	
+	
 }
